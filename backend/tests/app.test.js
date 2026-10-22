@@ -1,3 +1,8 @@
+/**
+ * Tests for the Express skeleton: the health check and the 404 handler.
+ * supertest sends real HTTP requests to the app without starting a server.
+ * Run with: npm test
+ */
 const { describe, it } = require('node:test');
 const assert = require('node:assert/strict');
 const request = require('supertest');

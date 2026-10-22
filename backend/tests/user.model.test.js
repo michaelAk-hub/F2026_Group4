@@ -1,3 +1,9 @@
+/**
+ * Tests for the User model rules (report RQ01-RQ03, RQ23-RQ24).
+ * Each test saves users in the in-memory database and checks that valid
+ * users are accepted and invalid ones are rejected with the right error.
+ * Run with: npm test
+ */
 const { describe, it, before, after, afterEach } = require('node:test');
 const assert = require('node:assert/strict');
 const User = require('../src/models/User');
@@ -11,9 +17,9 @@ const validDriver = {
 };
 
 describe('User model', () => {
-  before(startTestDB);
-  afterEach(clearTestDB);
-  after(stopTestDB);
+  before(startTestDB);     // once, before all tests
+  afterEach(clearTestDB);  // after every test: empty the database
+  after(stopTestDB);       // once, at the end
 
   it('saves a valid driver with default role and normalised fields', async () => {
     const user = await User.create(validDriver);
