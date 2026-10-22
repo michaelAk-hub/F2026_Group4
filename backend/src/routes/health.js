@@ -1,27 +1,17 @@
-/**
- * GET /api/health
- *
- * A simple "is everything up?" check. Useful for the team, for the
- * hosting platform and for the frontend to show if the server is down.
- *
- * Example answer when everything works (HTTP 200):
- *   { "status": "ok", "database": "connected", "time": "2026-10-20T14:22:06.974Z" }
- * When the database is down it answers HTTP 503 with status "degraded".
- */
 const express = require('express');
 const mongoose = require('mongoose');
 
 const router = express.Router();
 
+// GET /api/health -> shows if the server and the database are working
 router.get('/', (req, res) => {
-  // readyState 1 means Mongoose is connected (0 = disconnected,
-  // 2 = connecting, 3 = disconnecting).
-  const dbConnected = mongoose.connection.readyState === 1;
-  res.status(dbConnected ? 200 : 503).json({
-    status: dbConnected ? 'ok' : 'degraded',
-    database: dbConnected ? 'connected' : 'disconnected',
-    time: new Date().toISOString(), // UTC time of the answer
-  });
+  const dbConnected = mongoose.connection.readyState === 1; // 1 = connected
+
+  if (dbConnected) {
+    res.status(200).json({ status: 'ok', database: 'connected' });
+  } else {
+    res.status(503).json({ status: 'error', database: 'disconnected' });
+  }
 });
 
 module.exports = router;

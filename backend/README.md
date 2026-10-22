@@ -18,7 +18,7 @@ npm run dev            # restarts on file changes
 ```
 
 Check that it works: <http://localhost:5050/api/health> should return
-`{"status":"ok","database":"connected",...}`.
+`{"status":"ok","database":"connected"}`.
 
 ## Scripts
 

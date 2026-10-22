@@ -1,17 +1,13 @@
-/**
- * Main router: connects each URL group to its own route file.
- * Everything here is mounted under /api in app.js, so
- * '/health' below becomes '/api/health'.
- *
- * Each week a new line is added here for the new feature.
- */
 const express = require('express');
 const healthRoutes = require('./health');
 
 const router = express.Router();
 
+// /api/health
 router.use('/health', healthRoutes);
-// Week 2: router.use('/auth', require('./auth'));   -> /api/auth/register, /api/auth/login
-// Week 3: router.use('/spots', require('./spots')); -> /api/spots
+
+// Next weeks:
+// router.use('/auth', require('./auth'));   // week 2: register / login
+// router.use('/spots', require('./spots')); // week 3: parking spots
 
 module.exports = router;

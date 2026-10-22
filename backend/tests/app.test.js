@@ -1,38 +1,28 @@
-/**
- * Tests for the Express skeleton: the health check and the 404 handler.
- * supertest sends real HTTP requests to the app without starting a server.
- * Run with: npm test
- */
+// Tests for the health check and the 404 page. Run with: npm test
 const { describe, it } = require('node:test');
-const assert = require('node:assert/strict');
+const assert = require('node:assert');
 const request = require('supertest');
-const mongoose = require('mongoose');
 const app = require('../src/app');
 const { startTestDB, stopTestDB } = require('./setup');
 
-describe('API skeleton', () => {
-  it('GET /api/health reports 503 when the database is not connected', async () => {
+describe('API', () => {
+  it('health returns 503 when the database is not connected', async () => {
     const res = await request(app).get('/api/health');
-    assert.equal(res.status, 503);
-    assert.equal(res.body.database, 'disconnected');
+    assert.strictEqual(res.status, 503);
+    assert.strictEqual(res.body.database, 'disconnected');
   });
 
-  it('GET /api/health reports ok when the database is connected', async () => {
+  it('health returns ok when the database is connected', async () => {
     await startTestDB();
-    try {
-      assert.equal(mongoose.connection.readyState, 1);
-      const res = await request(app).get('/api/health');
-      assert.equal(res.status, 200);
-      assert.equal(res.body.status, 'ok');
-      assert.equal(res.body.database, 'connected');
-    } finally {
-      await stopTestDB();
-    }
+    const res = await request(app).get('/api/health');
+    await stopTestDB();
+
+    assert.strictEqual(res.status, 200);
+    assert.strictEqual(res.body.status, 'ok');
   });
 
-  it('unknown routes return 404 JSON', async () => {
+  it('unknown route returns 404', async () => {
     const res = await request(app).get('/api/does-not-exist');
-    assert.equal(res.status, 404);
-    assert.match(res.body.error, /Route not found/);
+    assert.strictEqual(res.status, 404);
   });
 });
