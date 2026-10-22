@@ -44,7 +44,7 @@ Check that it works: <http://localhost:5050/api/health> should return
 |---------------|------------------------------------------------------|
 | `npm start`   | Start the API                                        |
 | `npm run dev` | Start the API and restart it when a file changes     |
-| `npm test`    | Run the tests (uses an in-memory MongoDB, not yours) |
+| `npm test`    | Run the tests (uses an in-memory MongoDB, not yours). New test files must be added to the "test" script in package.json |
 
 The first `npm test` downloads a MongoDB binary (~70 MB) once.
 
