@@ -1,0 +1,21 @@
+{
+  "name": "smart-parking-backend",
+  "version": "1.0.0",
+  "description": "Smart Parking Management System backend",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "jest"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^18.0.9"
+  },
+  "devDependencies": {
+    "jest": "^30.5.2"
+  }
+}
