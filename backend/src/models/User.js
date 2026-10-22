@@ -1,58 +1,51 @@
 const mongoose = require('mongoose');
 
-// User model: how a user is saved in the database.
-// Fields come from the report (RQ01 - RQ03, RQ23, RQ24).
-const userSchema = new mongoose.Schema(
-  {
-    name: {
-      type: String,
-      required: [true, 'Name is required'],
-      trim: true,
-    },
-    email: {
-      type: String,
-      required: [true, 'Email is required'],
-      unique: true, // no two users with the same email
-      lowercase: true,
-      trim: true,
-      match: [/^\S+@\S+\.\S+$/, 'Email is not valid'],
-    },
-    // We never save the real password, only the hashed one (RQ23).
-    // select: false means it is not returned when we search for users.
-    passwordHash: {
-      type: String,
-      required: true,
-      select: false,
-    },
-    // Drivers need a car number to reserve a spot (RQ02), admins do not.
-    carNumber: {
-      type: String,
-      trim: true,
-      uppercase: true,
-      required: [
-        function () {
-          return this.role === 'driver';
+// User = the driver. Login details (email, password) are in Account.js
+const userSchema = new mongoose.Schema
+(
+    {
+        userName:
+        {
+            type: String,
+            required: [true, 'Name is required'],
+            trim: true,
+            minlength: 2,
         },
-        'Car number is required',
-      ],
+
+        // RQ02: every driver must give a car number
+        userCarNumber:
+        {
+            type: String,
+            required: [true, 'Car number is required'],
+            trim: true,
+            uppercase: true,
+            minlength: 5
+        },
+
+        userPaymentMethod:
+        {
+            type: String
+        }
     },
-    // Driver or admin (RQ24)
-    role: {
-      type: String,
-      enum: ['driver', 'admin'],
-      default: 'driver',
-    },
-  },
-  { timestamps: true } // adds createdAt and updatedAt
+    {
+        timestamps: true,
+        toJSON: {virtuals: true},
+        toObject: {virtuals: true}
+    }
 );
 
-// Hide the password hash when a user is sent back as JSON.
-userSchema.set('toJSON', {
-  transform(doc, ret) {
-    delete ret.passwordHash;
-    delete ret.__v;
-    return ret;
-  },
+userSchema.virtual('makes',
+{
+    ref: 'Reservation',
+    localField: '_id',
+    foreignField: 'userID'
 });
 
-module.exports = mongoose.model('User', userSchema);
+userSchema.virtual('has',
+{
+    ref: 'Account',
+    localField: '_id',
+    foreignField: 'userID'
+});
+
+module.exports = mongoose.model('User',userSchema);

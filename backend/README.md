@@ -55,7 +55,7 @@ src/
   app.js            Express app: middleware + routes (no DB, used by tests)
   server.js         Connects to MongoDB and starts the server
   config/           env.js (settings from .env), db.js (Mongo connection)
-  models/           Mongoose models (User, ...)
+  models/           Mongoose models (User, Account, ...)
   routes/           URL → controller mapping, mounted under /api
   controllers/      Request handlers
   middleware/       Error handling, auth guards (week 2)
@@ -73,5 +73,7 @@ More endpoints follow each week (auth in week 2, spots in week 3).
 
 ## Models
 
-**User** – `name`, `email` (unique, lower-case), `passwordHash` (never returned),
-`carNumber` (required for drivers, RQ02), `role` (`driver` | `admin`), timestamps.
+**User** (the driver) – `userName`, `userCarNumber` (required, RQ02), `userPaymentMethod`, timestamps.
+
+**Account** (login details) – `accountEmail` (unique, lower-case), `accountPasswordHash` (never returned),
+`userID` or `administratorID`, timestamps.
