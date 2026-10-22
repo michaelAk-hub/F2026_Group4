@@ -1,0 +1,74 @@
+# Smart Parking Management System – F2026_Group4
+
+CSE410 Software Engineering II, European University Cyprus.
+
+## Team
+
+| Member | Role | GitHub ID |
+|---|---|---|
+| <Name> | Member 1 – Frontend (design system, map, reservation flow, reports UI) | <id> |
+| <Name> | Member 2 – Frontend (layouts, payment UI, profile, accessibility) | <id> |
+| <Name> | Member 3 – Backend (auth, spots API, reservations, admin API) | <id> |
+| <Name> | Member 4 – Backend (sensors/MQTT, payments, violations, load tests) | <id> |
+| <Name> | Member 5 – Full-stack (admin dashboard, SSE stream, profile + reports APIs, QA) | <id> |
+
+## Tech stack
+
+- **Frontend:** HTML, CSS, JavaScript (no framework), Fetch API, EventSource, Chart.js
+- **Backend:** Node.js + Express.js, JWT, bcrypt, helmet, express-rate-limit
+- **Database:** MongoDB + Mongoose
+- **Sensors:** ESP32 simulated by a Node script, Mosquitto MQTT broker, mqtt.js
+- **Testing:** Jest, Supertest, Postman/Newman, autocannon or k6, Lighthouse
+
+## Repository structure
+
+```
+frontend/    HTML/CSS/JS client
+backend/     Node.js + Express API
+  src/       application code
+  tests/     Jest tests
+simulator/   ESP32 sensor simulator (MQTT)
+docs/        report, diagrams
+.github/     CI workflow, PR and issue templates
+```
+
+## Getting started
+
+1. Install Node.js 20+, MongoDB and Mosquitto.
+2. Install the backend dependencies:
+   ```bash
+   cd backend
+   npm install
+   ```
+3. Create your local environment file and fill in the values:
+   ```bash
+   cp .env.example .env
+   ```
+   `.env` holds secrets and is git-ignored. Never commit it.
+4. Run the tests:
+   ```bash
+   npm test
+   ```
+
+## Environment variables
+
+| Variable | Required | Description |
+|---|---|---|
+| `PORT` | yes | Port the API listens on (1–65535) |
+| `MONGODB_URI` | yes | MongoDB connection string |
+| `JWT_SECRET` | yes | Secret for signing JWTs (at least 32 characters) |
+| `MQTT_URL` | yes | Mosquitto broker URL |
+| `NODE_ENV` | no | `development` (default) or `production` |
+| `JWT_EXPIRES_IN` | no | Token lifetime, default `1h` |
+
+The backend validates these at startup (`backend/src/config/env.js`) and stops with a clear error if one is missing or invalid.
+
+## Branching and commit rules
+
+- `main`: always runs; only receives merges from `dev`. Merged before every weekly submission, because only commits on `main` are graded.
+- `dev`: integration branch.
+- `feature/member-N-short-name`: one branch per task. Open a pull request into `dev`, reviewed by 1 member from the other side (frontend ↔ backend). CI must pass.
+- Merge with **Create a merge commit** (not squash or rebase) so the original commits appear on `main`.
+- Commit messages: `type(scope): what changed` (`feat`, `fix`, `test`, `docs`, `chore`).
+- Each member's essential weekly commit is merged by Sunday 23:59.
+- Track tasks on the GitHub Projects board; link each PR to its issue with `Closes #<number>`.
