@@ -65,10 +65,28 @@ The backend validates these at startup (`backend/src/config/env.js`) and stops w
 
 ## Branching and commit rules
 
-- `main`: always runs; only receives merges from `dev`. Merged before every weekly submission, because only commits on `main` are graded.
-- `dev`: integration branch.
-- `feature/member-N-short-name`: one branch per task. Open a pull request into `dev`, reviewed by 1 member from the other side (frontend ↔ backend). CI must pass.
-- Merge with **Create a merge commit** (not squash or rebase) so the original commits appear on `main`.
+The instructor only accepts commits that are on `main`, so everyone commits directly to `main`. There is no `dev` branch.
+
+Before you push, follow these 3 rules so `main` keeps working:
+
+1. **Sync before you start working:** `git pull origin main`
+2. **Run the tests before you push:** `cd backend && npm test`. Only push if everything passes.
+3. **Only commit your own files:** add files by name (`git add path/to/file`), not `git add .`, and never edit or delete a teammate's files without asking them.
+
+Typical workflow:
+
+```bash
+git pull origin main
+# ... make your changes ...
+cd backend && npm test && cd ..
+git add <your files>
+git commit -m "feat(scope): what changed"
+git pull origin main   # get teammates' latest work before pushing
+git push origin main
+```
+
+- If you already have work on a `feature/...` branch, merge it into `main` (`git checkout main && git pull && git merge feature/<branch> && git push origin main`).
 - Commit messages: `type(scope): what changed` (`feat`, `fix`, `test`, `docs`, `chore`).
-- Each member's essential weekly commit is merged by Sunday 23:59.
-- Track tasks on the GitHub Projects board; link each PR to its issue with `Closes #<number>`.
+- Each member's essential weekly commit is on `main` by Sunday 23:59.
+- GitHub Actions runs the tests on every push to `main`; fix a red ✗ straight away.
+- Track tasks on the GitHub Projects board.
