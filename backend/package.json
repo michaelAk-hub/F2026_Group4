@@ -1,27 +1,32 @@
 {
   "name": "smart-parking-backend",
   "version": "1.0.0",
-  "description": "Smart Parking Management System - backend API (Node.js + Express + MongoDB)",
+  "description": "Smart Parking Management System backend",
   "main": "src/server.js",
+  "directories": {
+    "test": "tests"
+  },
   "scripts": {
     "start": "node src/server.js",
     "dev": "node --watch src/server.js",
-    "test": "node --test tests/app.test.js tests/user.model.test.js tests/account.model.test.js"
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
   },
   "keywords": [],
-  "type": "commonjs",
+  "author": "",
+  "license": "ISC",
   "dependencies": {
     "cors": "^2.8.6",
-    "dotenv": "^18.0.8",
+    "dotenv": "^18.0.9",
     "express": "^5.3.0",
     "mongoose": "^9.11.2"
   },
   "devDependencies": {
+    "jest": "^30.5.2",
     "mongodb-memory-server": "^11.3.0",
     "supertest": "^7.3.1"
   },
-  "engines": {
-    "node": ">=20"
+  "jest": {
+    "testTimeout": 60000
   },
   "config": {
     "mongodbMemoryServer": {

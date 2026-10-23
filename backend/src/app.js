@@ -1,12 +1,11 @@
 const express = require('express');
 const cors = require('cors');
-const env = require('./config/env');
 const routes = require('./routes');
 const { notFound, errorHandler } = require('./middleware/errorHandler');
 
 const app = express();
 
-app.use(cors({ origin: env.corsOrigin })); // allow the frontend to call the API
+app.use(cors()); // allow the frontend to call the API
 app.use(express.json()); // read JSON data sent in requests
 
 // All our endpoints start with /api

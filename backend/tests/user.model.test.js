@@ -1,6 +1,4 @@
 // Tests for the User model rules. Run with: npm test
-const { describe, it, before, after, afterEach } = require('node:test');
-const assert = require('node:assert');
 const User = require('../src/models/User');
 const { startTestDB, clearTestDB, stopTestDB } = require('./setup');
 
@@ -11,25 +9,25 @@ const driver = {
 };
 
 describe('User model', () => {
-  before(startTestDB);
+  beforeAll(startTestDB);
   afterEach(clearTestDB);
-  after(stopTestDB);
+  afterAll(stopTestDB);
 
-  it('saves a valid driver', async () => {
+  test('saves a valid driver', async () => {
     const user = await User.create(driver);
-    assert.strictEqual(user.userName, 'Maria Driver');
-    assert.strictEqual(user.userCarNumber, 'KAB 123'); // saved in uppercase
+    expect(user.userName).toBe('Maria Driver');
+    expect(user.userCarNumber).toBe('KAB 123'); // saved in uppercase
   });
 
-  it('needs a name', async () => {
-    await assert.rejects(User.create({ userCarNumber: 'ABC 123' }), /Name is required/);
+  test('needs a name', async () => {
+    await expect(User.create({ userCarNumber: 'ABC 123' })).rejects.toThrow('Name is required');
   });
 
-  it('driver needs a car number (RQ02)', async () => {
-    await assert.rejects(User.create({ userName: 'No Car' }), /Car number is required/);
+  test('driver needs a car number (RQ02)', async () => {
+    await expect(User.create({ userName: 'No Car' })).rejects.toThrow('Car number is required');
   });
 
-  it('rejects a car number that is too short', async () => {
-    await assert.rejects(User.create({ ...driver, userCarNumber: 'AB1' }), { name: 'ValidationError' });
+  test('rejects a car number that is too short', async () => {
+    await expect(User.create({ ...driver, userCarNumber: 'AB1' })).rejects.toMatchObject({ name: 'ValidationError' });
   });
 });

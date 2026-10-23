@@ -1,6 +1,4 @@
 // Tests for the Account model (login details). Run with: npm test
-const { describe, it, before, after, afterEach } = require('node:test');
-const assert = require('node:assert');
 const mongoose = require('mongoose');
 const Account = require('../src/models/Account');
 const { startTestDB, clearTestDB, stopTestDB } = require('./setup');
@@ -13,44 +11,42 @@ const account = {
 };
 
 describe('Account model', () => {
-  before(startTestDB);
+  beforeAll(startTestDB);
   afterEach(clearTestDB);
-  after(stopTestDB);
+  afterAll(stopTestDB);
 
-  it('saves a valid account', async () => {
+  test('saves a valid account', async () => {
     const acc = await Account.create(account);
-    assert.strictEqual(acc.accountEmail, 'maria@example.com'); // saved in lowercase
+    expect(acc.accountEmail).toBe('maria@example.com'); // saved in lowercase
   });
 
-  it('needs email and password', async () => {
-    await assert.rejects(Account.create({ userID: account.userID }), { name: 'ValidationError' });
+  test('needs email and password', async () => {
+    await expect(Account.create({ userID: account.userID })).rejects.toMatchObject({ name: 'ValidationError' });
   });
 
-  it('rejects a wrong email', async () => {
-    await assert.rejects(Account.create({ ...account, accountEmail: 'not-an-email' }), /Email is not valid/);
+  test('rejects a wrong email', async () => {
+    await expect(Account.create({ ...account, accountEmail: 'not-an-email' })).rejects.toThrow('Email is not valid');
   });
 
-  it('needs a user or an administrator', async () => {
-    await assert.rejects(
-      Account.create({ accountEmail: 'a@b.com', accountPasswordHash: 'x' }),
-      /Account needs a user or an administrator/
-    );
+  test('needs a user or an administrator', async () => {
+    await expect(Account.create({ accountEmail: 'a@b.com', accountPasswordHash: 'x' }))
+      .rejects.toThrow('Account needs a user or an administrator');
 
     const admin = await Account.create({ accountEmail: 'admin@b.com', accountPasswordHash: 'x', administratorID: new mongoose.Types.ObjectId() });
-    assert.ok(admin.administratorID);
+    expect(admin.administratorID).toBeTruthy();
   });
 
-  it('does not allow the same email twice', async () => {
+  test('does not allow the same email twice', async () => {
     await Account.init(); // makes sure the unique email rule is ready
     await Account.create(account);
-    await assert.rejects(Account.create(account), { code: 11000 });
+    await expect(Account.create(account)).rejects.toMatchObject({ code: 11000 });
   });
 
-  it('does not show the password hash', async () => {
+  test('does not show the password hash', async () => {
     const acc = await Account.create(account);
-    assert.strictEqual(acc.toJSON().accountPasswordHash, undefined);
+    expect(acc.toJSON().accountPasswordHash).toBeUndefined();
 
     const found = await Account.findOne({ accountEmail: 'maria@example.com' });
-    assert.strictEqual(found.accountPasswordHash, undefined);
+    expect(found.accountPasswordHash).toBeUndefined();
   });
 });
