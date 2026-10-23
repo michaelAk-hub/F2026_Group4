@@ -27,7 +27,11 @@ describe('User model', () => {
     await expect(User.create({ userName: 'No Car' })).rejects.toThrow('Car number is required');
   });
 
-  test('rejects a car number that is too short', async () => {
-    await expect(User.create({ ...driver, userCarNumber: 'AB1' })).rejects.toMatchObject({ name: 'ValidationError' });
+  test('car number must have 3-7 characters', async () => {
+    await expect(User.create({ ...driver, userCarNumber: 'AB' })).rejects.toThrow('Car number must have 3-7 characters');
+    await expect(User.create({ ...driver, userCarNumber: 'KAB 1234' })).rejects.toThrow('Car number must have 3-7 characters'); // 8 with the space
+
+    const oldPlate = await User.create({ ...driver, userCarNumber: 'ab1' });
+    expect(oldPlate.userCarNumber).toBe('AB1');
   });
 });

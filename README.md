@@ -6,11 +6,11 @@ CSE410 Software Engineering II, European University Cyprus.
 
 | Member | Role | GitHub ID |
 |---|---|---|
-| <Name> | Member 1 – Frontend (design system, map, reservation flow, reports UI) | <id> |
-| <Name> | Member 2 – Frontend (layouts, payment UI, profile, accessibility) | <id> |
-| <Name> | Member 3 – Backend (auth, spots API, reservations, admin API) | giorgos1990 |
-| <Name> | Member 4 – Backend (sensors/MQTT, payments, violations, load tests) | <id> |
-| <Name> | Member 5 – Full-stack (admin dashboard, SSE stream, profile + reports APIs, QA) | michaelAk-hub |
+| Maria Antoniou | Member 1 – Frontend (design system, map, reservation flow, reports UI) | MariaAnt135 |
+| Larisa Stefania Opritescu | Member 2 – Frontend (layouts, payment UI, profile, accessibility) | Stefania-Opritescu |
+| Georgios Georgiou | Member 3 – Backend (auth, spots API, reservations, admin API) | giorgos1990 |
+| Neofytos Papaconstantinou | Member 4 – Backend (sensors/MQTT, payments, violations, load tests) | Fytoss |
+| Michalis Koutoumpas | Member 5 – Full-stack (admin dashboard, SSE stream, profile + reports APIs, QA) | michaelAk-hub |
 
 ## Tech stack
 
@@ -50,7 +50,8 @@ docs/        report, diagrams
    ```
 3. Create your local environment file and fill in the values:
    ```bash
-   cp .env.example .env
+   cp .env.example .env      # Mac / Linux
+   copy .env.example .env    # Windows
    ```
    `.env` holds secrets and is git-ignored. Never commit it.
 4. Start the API (MongoDB must be running):

@@ -1,7 +1,9 @@
+// Tests for the config loader (src/config/env.js). Run with: npm test
 const fs = require('fs');
 const path = require('path');
 const { loadConfig, REQUIRED } = require('../src/config/env');
 
+// A correct set of settings we reuse in the tests
 const valid = {
   PORT: '3000',
   MONGODB_URI: 'mongodb://localhost:27017/smart_parking',
