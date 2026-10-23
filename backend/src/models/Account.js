@@ -8,17 +8,18 @@ const accountSchema = new mongoose.Schema
         {
             type: String,
             required: [true, 'Email is required'],
-            unique: true,
-            lowercase: true,
+            unique: true,     // two accounts cannot have the same email
+            lowercase: true,  // "Maria@Example.com" is saved as "maria@example.com"
             trim: true,
-            match: [/^\S+@\S+\.\S+$/, 'Email is not valid']
+            match: [/^\S+@\S+\.\S+$/, 'Email is not valid'] // must look like name@site.com
         },
 
+        // we save only the hash of the password, never the password itself
         accountPasswordHash:
         {
             type: String,
             required: true,
-            select: false
+            select: false     // not returned when we read accounts from the database
         },
 
         // needed only when the account is not an administrator
@@ -35,7 +36,7 @@ const accountSchema = new mongoose.Schema
             ref: 'Administrator'
         }
     },
-    { timestamps: true }
+    { timestamps: true }      // adds createdAt and updatedAt
 );
 
 // never send the password hash back
@@ -44,7 +45,7 @@ accountSchema.set('toJSON',
     transform(account, ret)
     {
         delete ret.accountPasswordHash;
-        delete ret.__v;
+        delete ret.__v;       // __v is an internal Mongoose field
         return ret;
     },
 });
