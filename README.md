@@ -8,9 +8,9 @@ CSE410 Software Engineering II, European University Cyprus.
 |---|---|---|
 | <Name> | Member 1 – Frontend (design system, map, reservation flow, reports UI) | <id> |
 | <Name> | Member 2 – Frontend (layouts, payment UI, profile, accessibility) | <id> |
-| <Name> | Member 3 – Backend (auth, spots API, reservations, admin API) | <id> |
+| <Name> | Member 3 – Backend (auth, spots API, reservations, admin API) | giorgos1990 |
 | <Name> | Member 4 – Backend (sensors/MQTT, payments, violations, load tests) | <id> |
-| <Name> | Member 5 – Full-stack (admin dashboard, SSE stream, profile + reports APIs, QA) | <id> |
+| <Name> | Member 5 – Full-stack (admin dashboard, SSE stream, profile + reports APIs, QA) | michaelAk-hub |
 
 ## Tech stack
 
@@ -25,7 +25,15 @@ CSE410 Software Engineering II, European University Cyprus.
 ```
 frontend/    HTML/CSS/JS client
 backend/     Node.js + Express API
-  src/       application code
+  src/
+    config/       environment settings (env.js) and database connection (db.js)
+    models/       Mongoose models (User, Account, ...)
+    routes/       API routes (all under /api)
+    controllers/  request handlers
+    middleware/   error handler and other middleware
+    utils/        helper functions
+    app.js        Express app
+    server.js     entry point: checks settings, connects to MongoDB, starts the API
   tests/     Jest tests
 simulator/   ESP32 sensor simulator (MQTT)
 docs/        report, diagrams
@@ -45,10 +53,16 @@ docs/        report, diagrams
    cp .env.example .env
    ```
    `.env` holds secrets and is git-ignored. Never commit it.
-4. Run the tests:
+4. Start the API (MongoDB must be running):
+   ```bash
+   npm start        # or: npm run dev  (restarts on file changes)
+   ```
+   Check it works: open http://localhost:3000/api/health. It returns `{"status":"ok","database":"connected"}`.
+5. Run the tests:
    ```bash
    npm test
    ```
+   The tests use a temporary in-memory MongoDB (`mongodb-memory-server`), so they don't need your local database. The first run downloads MongoDB, so it needs internet and can take a minute.
 
 ## Environment variables
 
