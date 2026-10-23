@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<!--
+  login.html
+  Summary: The login page. A user enters email and password. The form is checked by js/login.js (using the rules in js/validators.js). Design follows the login mockup in our report.
+-->
+<html lang="en">
+<!-- Page settings: character set, browser viewport, title and the shared stylesheet -->
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Login - Smart Parking</title>
+  <link rel="stylesheet" href="css/tokens.css">
+</head>
+<body>
+  <!-- JavaScript is needed for this Week 1 form demonstration. -->
+  <noscript>Please enable JavaScript to check this form.</noscript>
+  <!-- Whole page: left brand panel + right card -->
+  <div class="page">
+    <section class="brand">
+      <div class="brand-name"><span class="logo">P</span><span>SMART PARKING<small>MANAGEMENT SYSTEM</small></span></div>
+      <p class="tagline">Smart Parking, <b>Easy Life.</b></p>
+    </section>
+
+    <!-- The card with the form -->
+    <main class="card">
+      <div class="avatar" aria-hidden="true">👤</div>
+      <h1>Welcome Back!</h1>
+      <p class="subtitle">Please login to your account</p>
+      <!-- novalidate = we do our own checks in JavaScript instead of the browser default.
+           Each <p class="error"> below is where an error message appears for that field. -->
+      <form data-type="login" novalidate>
+        <div class="field">
+          <label for="email">Email</label>
+          <div class="input-wrap">
+            <span class="icon" aria-hidden="true">✉</span>
+            <input id="email" required aria-describedby="email-error" name="email" type="email" placeholder="Enter your email" autocomplete="email">
+          </div>
+          <p id="email-error" class="error" data-for="email"></p>
+        </div>
+        <div class="field">
+          <label for="password">Password</label>
+          <div class="input-wrap">
+            <span class="icon" aria-hidden="true">🔒</span>
+            <input id="password" required aria-describedby="password-error" name="password" type="password" placeholder="Enter your password" autocomplete="current-password">
+            <button type="button" class="eye" onclick="showPassword('password', this)" aria-label="Show password">Show</button>
+          </div>
+          <p id="password-error" class="error" data-for="password"></p>
+        </div>
+        <button class="btn" type="submit">LOGIN</button>
+        <p id="message" class="message" role="status"></p>
+      </form>
+      <p class="divider">OR</p>
+      <p class="switch switch-login">Don't have an account? <a href="register.html">Register here</a></p>
+    </main>
+  </div>
+  <!-- Scripts (order matters): rules first, then helpers, then this page's code -->
+  <script src="js/validators.js"></script>
+  <script src="js/common.js"></script>
+  <script src="js/login.js"></script>
+</body>
+</html>

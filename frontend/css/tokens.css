@@ -1,0 +1,264 @@
+/*
+  tokens.css
+  Summary: This is the shared stylesheet for the Smart Parking System. It stores the
+  "design tokens" (colours, spacing, font) as CSS variables and the base styles for the
+  layout, card, inputs and buttons. Both register.html and login.html link to this file,
+  so every page looks the same, and other team members can reuse it for their pages.
+*/
+/* ---- Variables: colours, spacing, radius and font are written once here
+   and reused everywhere with var(--name), so changing one value updates every page. ---- */
+:root {
+  --color-primary: #1558d6;
+  --color-primary-dark: #0f46ad;
+  --color-navy: #0f1f4b;
+  --color-bg: #e8f0fb;
+  --color-card: #ffffff;
+  --color-text: #1b1f27;
+  --color-muted: #5b6472;
+  --color-border: #d5dae3;
+  --color-error: #c62828;
+  --color-success: #2e7d32;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 16px;
+  --space-4: 24px;
+  --radius: 10px;
+  --font-main: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+/* Makes width include padding and border, so sizes are easier to calculate */
+* {
+  box-sizing: border-box;
+}
+
+/* Page background (light blue gradient) and default text style */
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: linear-gradient(180deg, #dbe8fa 0%, #f2f6fc 60%, #cfe3cf 100%);
+  color: var(--color-text);
+  font-family: var(--font-main);
+}
+
+/* Desktop layout: keep the brand panel and form side by side.
+   The page needs at least 1000px of width. Narrow windows will scroll
+   horizontally instead of switching to a phone layout. */
+.page {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: var(--space-4);
+  min-width: 1000px;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: var(--space-4);
+}
+
+/* Left panel: logo, title and the feature list */
+.brand h2 {
+  margin: var(--space-3) 0 var(--space-2);
+  color: var(--color-primary);
+  font-size: 1.8rem;
+}
+.brand p {
+  color: var(--color-muted);
+}
+.brand-name {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-weight: 800;
+  color: var(--color-navy);
+}
+.brand-name small {
+  display: block;
+  font-weight: 500;
+  font-size: 0.7rem;
+  letter-spacing: 1px;
+}
+.logo {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  background: var(--color-primary);
+  color: #fff;
+  font-size: 1.6rem;
+  font-weight: 800;
+}
+.tagline b {
+  color: var(--color-primary);
+}
+.features {
+  list-style: none;
+  margin: var(--space-3) 0 0;
+  padding: 0;
+}
+.features li {
+  margin-bottom: var(--space-3);
+  font-size: 0.9rem;
+}
+
+/* The white card that holds the form */
+.card {
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+  padding: var(--space-4);
+  background: var(--color-card);
+  border-radius: 14px;
+  box-shadow: 0 6px 24px rgba(15, 31, 75, 0.12);
+  text-align: center;
+}
+
+/* Round icon and the title/subtitle at the top of the card */
+.avatar {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  margin: 0 auto var(--space-2);
+  border-radius: 50%;
+  background: #dbe8fa;
+  font-size: 1.5rem;
+}
+h1 {
+  margin: 0;
+  font-size: 1.4rem;
+  color: var(--color-navy);
+}
+.subtitle {
+  margin: var(--space-1) 0 var(--space-3);
+  font-size: 0.85rem;
+  color: var(--color-muted);
+}
+
+/* Form fields: label, input with an icon inside, and the eye button */
+form {
+  text-align: left;
+}
+label {
+  display: block;
+  margin-bottom: var(--space-1);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+.field {
+  margin-bottom: var(--space-2);
+}
+
+.input-wrap {
+  position: relative;
+}
+.input-wrap .icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.9rem;
+  opacity: 0.7;
+}
+/* Leave space for the icon on the left and the Show/Hide button on the right.
+   The right padding remains when the password is shown as plain text. */
+.input-wrap input {
+  padding-left: 38px;
+  padding-right: 64px;
+}
+.eye {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: 0;
+  background: none;
+  cursor: pointer;
+  font-size: 0.8rem;
+  padding: 8px 4px;
+  color: var(--color-primary);
+}
+
+input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  font: inherit;
+  font-size: 0.9rem;
+}
+input:focus {
+  outline: 2px solid var(--color-primary);
+}
+
+/* Red error text shown under an input when the check fails */
+.error {
+  min-height: 1.1em;
+  margin: 2px 0 0;
+  font-size: 0.78rem;
+  color: var(--color-error);
+}
+
+/* The blue main button (REGISTER / LOGIN) */
+.btn {
+  width: 100%;
+  margin-top: var(--space-2);
+  padding: 12px;
+  border: 0;
+  border-radius: var(--radius);
+  background: var(--color-primary);
+  color: #fff;
+  font: inherit;
+  font-weight: 700;
+  letter-spacing: 1px;
+  cursor: pointer;
+}
+.btn:hover {
+  background: var(--color-primary-dark);
+}
+
+/* Green message shown when the form is valid */
+.message {
+  margin: var(--space-2) 0 0;
+  text-align: center;
+  font-size: 0.85rem;
+}
+.message.success {
+  color: var(--color-success);
+}
+
+/* "OR" line, link text and links at the bottom of the card */
+.divider {
+  margin: var(--space-3) 0;
+  text-align: center;
+  color: var(--color-muted);
+  font-size: 0.8rem;
+}
+.switch {
+  margin: var(--space-3) 0 0;
+  text-align: center;
+  font-size: 0.85rem;
+}
+a {
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+/* A clear keyboard outline helps people move through the form with Tab. */
+button:focus-visible, a:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 3px;
+}
+
+/* Red border and text together identify an invalid field. */
+input[aria-invalid="true"] {
+  border-color: var(--color-error);
+}
+.hint {
+  margin: 4px 0;
+  font-size: 0.78rem;
+  color: var(--color-muted);
+}
+.switch-login {
+  margin-top: 0;
+}
