@@ -66,7 +66,7 @@ test("isValidCarNumber: accepts ' ABC 123 '", function () {
 });
 
 test("isValidCarNumber: accepts 'AB-123'", function () {
-  assert.equal(validators.isValidCarNumber("AB-123"), true);
+  assert.equal(validators.isValidCarNumber("AB-123"), false);
 });
 
 test("isValidCarNumber: rejects ''", function () {
@@ -176,4 +176,14 @@ test("login rejects an invalid email", function () {
 // Angle brackets belong to display-name notation, not this address field.
 test("email rejects angle brackets", function () {
   assert.equal(validators.isValidEmail("a<@b.com"), false);
+});
+
+// Reject an extra number.
+test("car number rejects ABC1234", function () {
+  assert.equal(validators.isValidCarNumber("ABC1234"), false);
+});
+
+// Reject a missing letter.
+test("car number rejects AB123", function () {
+  assert.equal(validators.isValidCarNumber("AB123"), false);
 });

@@ -56,17 +56,17 @@ function isValidEmail(email) {
 }
 
 function isValidCarNumber(car) {
+  // Reject an empty car number.
   if (!car) {
     return false;
   }
+
+  // Remove accidental spaces before or after the value.
   car = car.trim();
-  // This is a general prototype rule, not an official plate-country check.
-  if (car.length < 3 || car.length > 10) {
-    return false;
-  }
-  // The first expression allows letters, digits, spaces and hyphens.
-  // The second requires at least one letter or digit (so --- is rejected).
-  return /^[A-Za-z0-9 -]+$/.test(car) && /[A-Za-z0-9]/.test(car);
+
+  // Require 3 letters followed by 3 numbers.
+  // Allow one optional space: ABC123 or ABC 123.
+  return /^[A-Za-z]{3} ?[0-9]{3}$/.test(car);
 }
 
 function isValidPassword(password) {
@@ -94,7 +94,7 @@ function validateRegister(data) {
     errors.confirmPassword = "Passwords do not match.";
   }
   if (!isValidCarNumber(data.carNumber)) {
-    errors.carNumber = "Use 3-10 characters: letters, numbers, spaces or hyphens; include a letter or number.";
+errors.carNumber = "Use 3 letters and 3 numbers: ABC123 or ABC 123.";
   }
 
   // No error properties means that all checks passed.
