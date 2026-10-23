@@ -1,0 +1,204 @@
+/* Styles for the driver pages (dashboard, reservation, my reservations) - Stefania
+   This file is loaded after Maria's tokens.css so I can use the same colours */
+
+/* top menu */
+.top-menu {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 16px 24px;
+}
+.menu-links {
+  display: flex;
+  gap: 16px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.menu-links a {
+  text-decoration: none;
+}
+.menu-links a.active {
+  text-decoration: underline;
+}
+
+/* page content */
+.content {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 24px 24px;
+}
+
+/* white box, same look as the card in the login page but wider */
+.box {
+  background: white;
+  border-radius: 14px;
+  box-shadow: 0 6px 24px rgba(15, 31, 75, 0.12);
+  padding: 24px;
+  margin-bottom: 16px;
+}
+.box h2 {
+  margin: 0 0 16px;
+  font-size: 1.1rem;
+  color: var(--color-navy);
+}
+
+.two-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+/* legend */
+.legend {
+  display: flex;
+  gap: 16px;
+  list-style: none;
+  margin: 0 0 16px;
+  padding: 0;
+  font-size: 0.85rem;
+}
+.legend span {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  margin-right: 6px;
+  border-radius: 3px;
+}
+
+/* spot colours */
+.empty {
+  background: green;
+}
+.occupied {
+  background: #d32f2f;
+}
+.reserved {
+  background: orange;
+}
+.unknown {
+  background: gray;
+}
+
+/* parking map */
+.map {
+  background: #3d4249;
+  border-radius: 10px;
+  padding: 16px 24px;
+}
+.parking-row {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  border-right: 3px solid white;
+}
+.spot {
+  height: 90px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.2rem;
+  font-weight: bold;
+  border-left: 3px solid white;
+}
+.top-row .spot {
+  border-top: 3px solid white;
+}
+.bottom-row .spot {
+  border-bottom: 3px solid white;
+}
+
+/* the road between the two rows */
+.driving-lane {
+  height: 60px;
+  display: flex;
+  align-items: center;
+  color: white;
+  font-size: 0.75rem;
+  font-weight: bold;
+}
+.lane-line {
+  flex: 1;
+  margin: 0 12px;
+  border-top: 4px dashed yellow;
+}
+
+/* summary numbers */
+.numbers {
+  display: flex;
+  justify-content: space-around;
+  text-align: center;
+}
+.numbers b {
+  display: block;
+  font-size: 1.5rem;
+  color: var(--color-primary);
+}
+.numbers span {
+  font-size: 0.8rem;
+  color: var(--color-muted);
+}
+
+/* the .btn from tokens.css is for buttons, these lines make it work on a link too */
+a.btn {
+  display: block;
+  text-align: center;
+  text-decoration: none;
+}
+
+/* reservation summary */
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--color-border);
+  font-size: 0.9rem;
+}
+
+.note {
+  font-size: 0.8rem;
+  color: var(--color-muted);
+  text-align: center;
+}
+
+/* filter buttons */
+.filters {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.filter-btn {
+  padding: 8px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: white;
+  cursor: pointer;
+}
+.filter-btn.active {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  font-weight: bold;
+}
+
+/* reservations table */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+th, td {
+  padding: 8px;
+  text-align: left;
+  border-bottom: 1px solid var(--color-border);
+}
+th {
+  color: var(--color-muted);
+  font-size: 0.8rem;
+}
+
+.empty-message {
+  text-align: center;
+  color: var(--color-muted);
+}
