@@ -5,7 +5,7 @@ const { startTestDB, clearTestDB, stopTestDB } = require('./setup');
 // A correct driver we reuse in the tests
 const driver = {
   userName: 'Maria Driver',
-  userCarNumber: 'kab 123',
+  userCarNumber: 'kab123',
 };
 
 describe('User model', () => {
@@ -16,7 +16,7 @@ describe('User model', () => {
   test('saves a valid driver', async () => {
     const user = await User.create(driver);
     expect(user.userName).toBe('Maria Driver');
-    expect(user.userCarNumber).toBe('KAB 123'); // saved in uppercase
+    expect(user.userCarNumber).toBe('KAB123'); // saved in uppercase
   });
 
   test('needs a name', async () => {
@@ -27,7 +27,11 @@ describe('User model', () => {
     await expect(User.create({ userName: 'No Car' })).rejects.toThrow('Car number is required');
   });
 
-  test('rejects a car number that is too short', async () => {
-    await expect(User.create({ ...driver, userCarNumber: 'AB1' })).rejects.toMatchObject({ name: 'ValidationError' });
+  test('car number must have 3-6 characters', async () => {
+    await expect(User.create({ ...driver, userCarNumber: 'AB' })).rejects.toThrow('Car number must have 3-6 characters');
+    await expect(User.create({ ...driver, userCarNumber: 'KAB 123' })).rejects.toThrow('Car number must have 3-6 characters'); // 7 with the space
+
+    const oldPlate = await User.create({ ...driver, userCarNumber: 'ab1' });
+    expect(oldPlate.userCarNumber).toBe('AB1');
   });
 });

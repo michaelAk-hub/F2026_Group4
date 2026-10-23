@@ -13,13 +13,15 @@ const userSchema = new mongoose.Schema
         },
 
         // RQ02: every driver must give a car number
+        // 3-6 characters, same rule as the register form (e.g. "KAB123", old plates are shorter)
         userCarNumber:
         {
             type: String,
             required: [true, 'Car number is required'],
             trim: true,
-            uppercase: true, // "kab 123" is saved as "KAB 123"
-            minlength: 5
+            uppercase: true, // "kab123" is saved as "KAB123"
+            minlength: [3, 'Car number must have 3-6 characters'],
+            maxlength: [6, 'Car number must have 3-6 characters']
         },
 
         // e.g. "Card" (optional)
