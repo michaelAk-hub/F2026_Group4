@@ -1,34 +1,72 @@
 /* Styles for the driver pages (dashboard, reservation, my reservations) - Stefania
    This file is loaded after Maria's tokens.css so I can use the same colours */
 
-/* top menu */
-.top-menu {
+/* whole page: navy menu on the left, content on the right */
+.app {
+  display: grid;
+  grid-template-columns: 230px 1fr;
+  min-height: 100vh;
+  background: #f4f7fc;
+}
+
+/* left menu */
+.sidebar {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  max-width: 1000px;
-  margin: 0 auto;
-  padding: 16px 24px;
+  flex-direction: column;
+  background: var(--color-navy);
+  padding: 24px 16px;
+}
+.sidebar .brand-name {
+  color: white;
+  margin-bottom: 24px;
 }
 .menu-links {
   display: flex;
-  gap: 16px;
+  flex-direction: column;
+  flex: 1;
+  gap: 6px;
   list-style: none;
   margin: 0;
   padding: 0;
 }
 .menu-links a {
+  display: block;
+  padding: 12px 14px;
+  border-radius: 10px;
+  color: #dbe4f7;
   text-decoration: none;
 }
+.menu-links a:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
 .menu-links a.active {
-  text-decoration: underline;
+  background: var(--color-primary);
+  color: white;
+}
+/* Logout goes to the bottom of the menu */
+.menu-links li:last-child {
+  margin-top: auto;
 }
 
 /* page content */
 .content {
-  max-width: 1000px;
-  margin: 0 auto;
-  padding: 0 24px 24px;
+  padding: 28px 32px;
+}
+
+/* title on the left, button on the right */
+.page-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.page-title .subtitle {
+  margin-bottom: 0;
+}
+.page-title .btn {
+  width: auto;
+  margin: 0;
+  padding: 12px 20px;
 }
 
 /* white box, same look as the card in the login page but wider */
@@ -125,19 +163,47 @@
   border-top: 4px dashed yellow;
 }
 
-/* summary numbers */
+/* the 4 number boxes on the dashboard */
 .numbers {
-  display: flex;
-  justify-content: space-around;
-  text-align: center;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-bottom: 16px;
 }
-.numbers b {
+.stat {
+  background: white;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 16px;
+}
+.stat span {
+  font-size: 0.85rem;
+  color: var(--color-muted);
+}
+.stat b {
   display: block;
-  font-size: 1.5rem;
-  color: var(--color-primary);
+  font-size: 1.8rem;
+  color: var(--color-navy);
 }
-.numbers span {
-  font-size: 0.8rem;
+.stat b.green-text {
+  color: var(--color-success);
+}
+.stat b.red-text {
+  color: var(--color-error);
+}
+.stat b.orange-text {
+  color: #9a6400;
+}
+
+/* upcoming reservation: text on the left, link on the right */
+.upcoming {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.upcoming h2 {
+  margin: 0 0 4px;
+  font-size: 0.85rem;
   color: var(--color-muted);
 }
 

@@ -31,6 +31,10 @@ for (let i = 0; i < pages.length; i++) {
       expect(links[1].getAttribute('href')).toBe('css/layout.css');
     });
 
+    test('menu is in the left sidebar', () => {
+      expect(document.querySelector('.sidebar .menu-links')).not.toBeNull();
+    });
+
     test('menu has 4 links and the last one is Logout', () => {
       const links = document.querySelectorAll('.menu-links a');
       expect(links.length).toBe(4);
@@ -97,6 +101,14 @@ describe('dashboard page', () => {
     const greenSpots = document.querySelectorAll('#map .spot.empty').length;
     const numbers = document.querySelectorAll('#summary .numbers b');
     expect(Number(numbers[1].textContent)).toBe(greenSpots);
+  });
+
+  test('the Total, Occupied and Reserved numbers match the map', () => {
+    const numbers = document.querySelectorAll('#summary .numbers b');
+    expect(numbers.length).toBe(4);
+    expect(Number(numbers[0].textContent)).toBe(document.querySelectorAll('#map .spot').length);
+    expect(Number(numbers[2].textContent)).toBe(document.querySelectorAll('#map .spot.occupied').length);
+    expect(Number(numbers[3].textContent)).toBe(document.querySelectorAll('#map .spot.reserved').length);
   });
 
   test('reserve button goes to the reservation page', () => {

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Driver dashboard - Stefania (Week 1) -->
+<!-- Driver dashboard - Stefania (Week 1, new design with the left menu) -->
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -9,83 +9,93 @@
   <link rel="stylesheet" href="css/layout.css">
 </head>
 <body>
-  <header class="top-menu">
-    <div class="brand-name"><span class="logo">P</span><span>SMART PARKING<small>MANAGEMENT SYSTEM</small></span></div>
-    <ul class="menu-links">
-      <li><a href="dashboard.html" class="active">Dashboard</a></li>
-      <li><a href="reservation.html">Reserve</a></li>
-      <li><a href="my-reservations.html">My Reservations</a></li>
-      <li><a href="login.html" onclick="logout(); return false;">Logout</a></li>
-    </ul>
-  </header>
-
-  <main class="content">
-    <h1>Parking Dashboard</h1>
-    <p class="subtitle">Find and reserve your parking space</p>
-
-    <section class="box" id="map-section">
-      <h2>Parking Map</h2>
-
-      <ul class="legend" id="legend">
-        <li><span class="empty"></span>Empty</li>
-        <li><span class="occupied"></span>Occupied</li>
-        <li><span class="reserved"></span>Reserved</li>
-        <li><span class="unknown"></span>Unknown</li>
+  <div class="app">
+    <nav class="sidebar">
+      <div class="brand-name"><span class="logo">P</span><span>SMART PARKING<small>MANAGEMENT SYSTEM</small></span></div>
+      <ul class="menu-links">
+        <li><a href="dashboard.html" class="active">Dashboard</a></li>
+        <li><a href="reservation.html">Reserve</a></li>
+        <li><a href="my-reservations.html">My Reservations</a></li>
+        <li><a href="login.html" onclick="logout(); return false;">Logout</a></li>
       </ul>
+    </nav>
 
-      <!-- for now the spots are written by hand, later they will come from the server -->
-      <div class="map" id="map">
-        <div class="parking-row top-row">
-          <div class="spot empty">01</div>
-          <div class="spot empty">02</div>
-          <div class="spot occupied">03</div>
-          <div class="spot empty">04</div>
-          <div class="spot reserved">05</div>
-          <div class="spot empty">06</div>
-          <div class="spot occupied">07</div>
-          <div class="spot empty">08</div>
-          <div class="spot unknown">09</div>
-          <div class="spot empty">10</div>
+    <main class="content">
+      <div class="page-title">
+        <div>
+          <h1>Parking Dashboard</h1>
+          <p class="subtitle">Find and reserve your parking space</p>
         </div>
-
-        <div class="driving-lane">
-          <span>ENTRANCE</span>
-          <div class="lane-line"></div>
-          <span>EXIT</span>
-        </div>
-
-        <div class="parking-row bottom-row">
-          <div class="spot empty">11</div>
-          <div class="spot occupied">12</div>
-          <div class="spot empty">13</div>
-          <div class="spot empty">14</div>
-          <div class="spot empty">15</div>
-          <div class="spot occupied">16</div>
-          <div class="spot empty">17</div>
-          <div class="spot empty">18</div>
-          <div class="spot empty">19</div>
-          <div class="spot empty">20</div>
+        <div id="quick-actions">
+          <a class="btn" href="reservation.html">+ RESERVE A SPOT</a>
         </div>
       </div>
-    </section>
 
-    <div class="two-columns">
-      <section class="box" id="summary">
-        <h2>Summary</h2>
+      <!-- numbers are example data for now -->
+      <section id="summary">
         <div class="numbers">
-          <div><b>20</b><span>Total spots</span></div>
-          <div><b>14</b><span>Empty</span></div>
-          <div><b>1</b><span>My reservations</span></div>
+          <div class="stat"><span>Total spots</span><b>20</b></div>
+          <div class="stat"><span>Empty</span><b class="green-text">14</b></div>
+          <div class="stat"><span>Occupied</span><b class="red-text">4</b></div>
+          <div class="stat"><span>Reserved</span><b class="orange-text">1</b></div>
         </div>
       </section>
 
-      <section class="box" id="quick-actions">
-        <h2>Need a spot?</h2>
-        <p class="subtitle">Choose an empty (green) spot and reserve it.</p>
-        <a class="btn" href="reservation.html">RESERVE A SPOT</a>
+      <section class="box" id="map-section">
+        <h2>Parking Map</h2>
+
+        <ul class="legend" id="legend">
+          <li><span class="empty"></span>Empty</li>
+          <li><span class="occupied"></span>Occupied</li>
+          <li><span class="reserved"></span>Reserved</li>
+          <li><span class="unknown"></span>Unknown</li>
+        </ul>
+
+        <!-- for now the spots are written by hand, later they will come from the server -->
+        <div class="map" id="map">
+          <div class="parking-row top-row">
+            <div class="spot empty">01</div>
+            <div class="spot empty">02</div>
+            <div class="spot occupied">03</div>
+            <div class="spot empty">04</div>
+            <div class="spot reserved">05</div>
+            <div class="spot empty">06</div>
+            <div class="spot occupied">07</div>
+            <div class="spot empty">08</div>
+            <div class="spot unknown">09</div>
+            <div class="spot empty">10</div>
+          </div>
+
+          <div class="driving-lane">
+            <span>ENTRANCE</span>
+            <div class="lane-line"></div>
+            <span>EXIT</span>
+          </div>
+
+          <div class="parking-row bottom-row">
+            <div class="spot empty">11</div>
+            <div class="spot occupied">12</div>
+            <div class="spot empty">13</div>
+            <div class="spot empty">14</div>
+            <div class="spot empty">15</div>
+            <div class="spot occupied">16</div>
+            <div class="spot empty">17</div>
+            <div class="spot empty">18</div>
+            <div class="spot empty">19</div>
+            <div class="spot empty">20</div>
+          </div>
+        </div>
       </section>
-    </div>
-  </main>
+
+      <section class="box upcoming">
+        <div>
+          <h2>Upcoming reservation</h2>
+          <b>Spot 05 · 26 Oct 2026 · 14:00 - 16:00</b>
+        </div>
+        <a href="my-reservations.html">View all</a>
+      </section>
+    </main>
+  </div>
 
   <!-- only a logged in driver can stay on this page -->
   <script src="js/auth.js"></script>

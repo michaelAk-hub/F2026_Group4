@@ -9,50 +9,52 @@
   <link rel="stylesheet" href="css/layout.css">
 </head>
 <body>
-  <header class="top-menu">
-    <div class="brand-name"><span class="logo">P</span><span>SMART PARKING<small>MANAGEMENT SYSTEM</small></span></div>
-    <ul class="menu-links">
-      <li><a href="dashboard.html">Dashboard</a></li>
-      <li><a href="reservation.html">Reserve</a></li>
-      <li><a href="my-reservations.html" class="active">My Reservations</a></li>
-      <li><a href="login.html" onclick="logout(); return false;">Logout</a></li>
-    </ul>
-  </header>
+  <div class="app">
+    <nav class="sidebar">
+      <div class="brand-name"><span class="logo">P</span><span>SMART PARKING<small>MANAGEMENT SYSTEM</small></span></div>
+      <ul class="menu-links">
+        <li><a href="dashboard.html">Dashboard</a></li>
+        <li><a href="reservation.html">Reserve</a></li>
+        <li><a href="my-reservations.html" class="active">My Reservations</a></li>
+        <li><a href="login.html" onclick="logout(); return false;">Logout</a></li>
+      </ul>
+    </nav>
 
-  <main class="content">
-    <h1>My Reservations</h1>
-    <p class="subtitle">Your reservation and payment history</p>
+    <main class="content">
+      <h1>My Reservations</h1>
+      <p class="subtitle">Your reservation and payment history</p>
 
-    <section class="box" id="reservations">
-      <!-- the filters will work in week 5 -->
-      <div class="filters" id="filters">
-        <button class="filter-btn active" type="button">All</button>
-        <button class="filter-btn" type="button">Upcoming</button>
-        <button class="filter-btn" type="button">Completed</button>
-        <button class="filter-btn" type="button">Cancelled</button>
-      </div>
+      <section class="box" id="reservations">
+        <!-- the filters will work in week 5 -->
+        <div class="filters" id="filters">
+          <button class="filter-btn active" type="button">All</button>
+          <button class="filter-btn" type="button">Upcoming</button>
+          <button class="filter-btn" type="button">Completed</button>
+          <button class="filter-btn" type="button">Cancelled</button>
+        </div>
 
-      <table id="reservations-table">
-        <thead>
-          <tr>
-            <th>Spot</th>
-            <th>Date</th>
-            <th>Time</th>
-            <th>Amount</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr><td>05</td><td>26 Oct 2026</td><td>14:00 - 16:00</td><td>€4.00</td><td>Upcoming</td></tr>
-          <tr><td>13</td><td>20 Oct 2026</td><td>11:00 - 13:00</td><td>€4.00</td><td>Completed</td></tr>
-          <tr><td>02</td><td>18 Oct 2026</td><td>16:00 - 18:00</td><td>€4.00</td><td>Cancelled</td></tr>
-        </tbody>
-      </table>
+        <table id="reservations-table">
+          <thead>
+            <tr>
+              <th>Spot</th>
+              <th>Date</th>
+              <th>Time</th>
+              <th>Amount</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>05</td><td>26 Oct 2026</td><td>14:00 - 16:00</td><td>€4.00</td><td>Upcoming</td></tr>
+            <tr><td>13</td><td>20 Oct 2026</td><td>11:00 - 13:00</td><td>€4.00</td><td>Completed</td></tr>
+            <tr><td>02</td><td>18 Oct 2026</td><td>16:00 - 18:00</td><td>€4.00</td><td>Cancelled</td></tr>
+          </tbody>
+        </table>
 
-      <!-- shown only when the user has no reservations -->
-      <p class="empty-message" id="empty-message" hidden>You have no reservations yet.</p>
-    </section>
-  </main>
+        <!-- shown only when the user has no reservations -->
+        <p class="empty-message" id="empty-message" hidden>You have no reservations yet.</p>
+      </section>
+    </main>
+  </div>
 
   <!-- only a logged in driver can stay on this page -->
   <script src="js/auth.js"></script>
