@@ -122,10 +122,19 @@ describe('reservation page', () => {
     loadPage('reservation.html');
   });
 
-  test('summary shows the spot and the total amount', () => {
-    const summary = document.getElementById('reservation-summary').textContent;
-    expect(summary).toContain('Parking spot');
-    expect(summary).toContain('Total amount');
+  test('summary is a ticket with the spot, date, time, duration and total', () => {
+    const ticket = document.getElementById('reservation-summary');
+    expect(ticket.classList.contains('ticket')).toBe(true);
+    expect(ticket.querySelector('.ticket-spot').textContent).toBe('05');
+    expect(ticket.textContent).toContain('Date');
+    expect(ticket.textContent).toContain('Time');
+    expect(ticket.textContent).toContain('Duration');
+    expect(ticket.textContent).toContain('Total amount');
+  });
+
+  test('Back link goes to the dashboard', () => {
+    const back = document.querySelector('#payment-form .back-btn');
+    expect(back.getAttribute('href')).toBe('dashboard.html');
   });
 
   test('payment form has the 4 card fields with labels', () => {

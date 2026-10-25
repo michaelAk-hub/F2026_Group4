@@ -214,13 +214,86 @@ a.btn {
   text-decoration: none;
 }
 
-/* reservation summary */
-.detail-row {
+/* reservation page: the summary looks like a parking ticket */
+.reserve-page {
+  align-items: start;
+}
+.ticket {
+  background: var(--color-navy);
+  color: white;
+  border-radius: 16px;
+  overflow: hidden;
+}
+.ticket-top {
   display: flex;
   justify-content: space-between;
-  padding: 8px 0;
-  border-bottom: 1px solid var(--color-border);
-  font-size: 0.9rem;
+  align-items: center;
+  padding: 22px 24px;
+}
+.ticket-label {
+  margin: 0;
+  font-size: 0.75rem;
+  letter-spacing: 1px;
+  color: #a9b6d3;
+}
+.ticket-top h2 {
+  margin: 2px 0 0;
+  font-size: 1.2rem;
+  color: white;
+}
+.ticket-spot {
+  display: grid;
+  place-items: center;
+  width: 60px;
+  height: 60px;
+  border-radius: 12px;
+  background: #f5b301;
+  color: #3b2a00;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+/* dashed line like a ticket you can tear */
+.ticket-line {
+  border-top: 2px dashed #3b4c86;
+  margin: 0 16px;
+}
+.ticket-details {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  padding: 18px 24px;
+}
+.ticket-details span {
+  display: block;
+  font-size: 0.8rem;
+  color: #a9b6d3;
+}
+.ticket-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--color-primary);
+  padding: 16px 24px;
+}
+.ticket-total b {
+  font-size: 1.6rem;
+}
+
+/* Back and Pay buttons next to each other */
+.form-buttons {
+  display: flex;
+  gap: 12px;
+}
+.form-buttons .btn {
+  flex: 1;
+}
+.back-btn {
+  margin-top: 8px;
+  padding: 12px 18px;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  color: var(--color-navy);
+  text-decoration: none;
 }
 
 .note {

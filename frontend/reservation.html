@@ -24,15 +24,23 @@
       <h1>Reserve a Spot</h1>
       <p class="subtitle">Check your reservation and pay to confirm it</p>
 
-      <div class="two-columns">
+      <div class="two-columns reserve-page">
         <!-- example data for now -->
-        <section class="box" id="reservation-summary">
-          <h2>Reservation Summary</h2>
-          <div class="detail-row"><span>Parking spot</span><b>05</b></div>
-          <div class="detail-row"><span>Date</span><b>26 Oct 2026</b></div>
-          <div class="detail-row"><span>Time</span><b>14:00 - 16:00</b></div>
-          <div class="detail-row"><span>Duration</span><b>2 hours</b></div>
-          <div class="detail-row"><span>Total amount</span><b>€4.00</b></div>
+        <section class="ticket" id="reservation-summary">
+          <div class="ticket-top">
+            <div>
+              <p class="ticket-label">PARKING TICKET</p>
+              <h2>City Center Parking</h2>
+            </div>
+            <span class="ticket-spot">05</span>
+          </div>
+          <div class="ticket-line"></div>
+          <div class="ticket-details">
+            <div><span>Date</span><b>26 Oct 2026</b></div>
+            <div><span>Time</span><b>14:00 - 16:00</b></div>
+            <div><span>Duration</span><b>2 hours</b></div>
+          </div>
+          <div class="ticket-total"><span>Total amount</span><b>€4.00</b></div>
         </section>
 
         <section class="box" id="payment">
@@ -61,7 +69,10 @@
               </div>
             </div>
             <!-- the button does nothing yet, the payment is added in week 4 -->
-            <button class="btn" type="button">PAY €4.00</button>
+            <div class="form-buttons">
+              <a class="back-btn" href="dashboard.html">Back</a>
+              <button class="btn" type="button">PAY €4.00</button>
+            </div>
             <p class="note">Your full card details are not stored.</p>
           </form>
         </section>
