@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<!-- Admin page shell - Stefania (Week 2). The admin layout is added in week 4 -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Admin - Smart Parking</title>
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/layout.css">
+</head>
+<body>
+  <header class="top-menu">
+    <div class="brand-name"><span class="logo">P</span><span>SMART PARKING<small>ADMINISTRATOR</small></span></div>
+    <ul class="menu-links">
+      <li><a href="admin.html" class="active">Admin</a></li>
+      <li><a href="login.html" onclick="logout(); return false;">Logout</a></li>
+    </ul>
+  </header>
+
+  <main class="content">
+    <h1>Administrator</h1>
+    <p class="subtitle">The admin pages will be added here in the next weeks.</p>
+  </main>
+
+  <!-- only a logged in admin can stay on this page -->
+  <script src="js/auth.js"></script>
+  <script>
+    requireRole("admin");
+  </script>
+</body>
+</html>

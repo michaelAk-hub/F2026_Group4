@@ -15,7 +15,7 @@
       <li><a href="dashboard.html" class="active">Dashboard</a></li>
       <li><a href="reservation.html">Reserve</a></li>
       <li><a href="my-reservations.html">My Reservations</a></li>
-      <li><a href="login.html">Logout</a></li>
+      <li><a href="login.html" onclick="logout(); return false;">Logout</a></li>
     </ul>
   </header>
 
@@ -86,5 +86,11 @@
       </section>
     </div>
   </main>
+
+  <!-- only a logged in driver can stay on this page -->
+  <script src="js/auth.js"></script>
+  <script>
+    requireRole("driver");
+  </script>
 </body>
 </html>

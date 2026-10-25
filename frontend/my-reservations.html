@@ -15,7 +15,7 @@
       <li><a href="dashboard.html">Dashboard</a></li>
       <li><a href="reservation.html">Reserve</a></li>
       <li><a href="my-reservations.html" class="active">My Reservations</a></li>
-      <li><a href="login.html">Logout</a></li>
+      <li><a href="login.html" onclick="logout(); return false;">Logout</a></li>
     </ul>
   </header>
 
@@ -53,5 +53,11 @@
       <p class="empty-message" id="empty-message" hidden>You have no reservations yet.</p>
     </section>
   </main>
+
+  <!-- only a logged in driver can stay on this page -->
+  <script src="js/auth.js"></script>
+  <script>
+    requireRole("driver");
+  </script>
 </body>
 </html>
