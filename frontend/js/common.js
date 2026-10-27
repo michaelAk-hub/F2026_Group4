@@ -46,16 +46,25 @@ function showErrors(errors) {
   }
 }
 
-// Remove an old success message before checking changed information.
+// Clear the previous message when the user edits the form.
 function clearMessage() {
   var message = document.getElementById("message");
   message.textContent = "";
   message.className = "message";
+  message.style.color = "";
 }
 
-// A valid form is not yet a registered account or an authenticated login.
-function showMessage(text) {
+// Show a success message, or a red error message.
+// Example: showMessage("Incorrect email or password.", true);
+function showMessage(text, isError) {
   var message = document.getElementById("message");
   message.textContent = text;
-  message.className = "message success";
+
+  if (isError) {
+    message.className = "message";
+    message.style.color = "#b42318";
+  } else {
+    message.className = "message success";
+    message.style.color = "";
+  }
 }
