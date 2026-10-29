@@ -6,8 +6,10 @@ const router = express.Router();
 // /api/health
 router.use('/health', healthRoutes);
 
+// /api/spots (Member 5, week 2)
+router.use('/spots', require('./spots'));
+
 // Next weeks:
 // router.use('/auth', require('./auth'));   // week 2: register / login
-// router.use('/spots', require('./spots')); // week 3: parking spots
 
 module.exports = router;
