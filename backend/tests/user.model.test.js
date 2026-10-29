@@ -27,11 +27,14 @@ describe('User model', () => {
     await expect(User.create({ userName: 'No Car' })).rejects.toThrow('Car number is required');
   });
 
-  test('car number must have 3-7 characters', async () => {
-    await expect(User.create({ ...driver, userCarNumber: 'AB' })).rejects.toThrow('Car number must have 3-7 characters');
-    await expect(User.create({ ...driver, userCarNumber: 'KAB 1234' })).rejects.toThrow('Car number must have 3-7 characters'); // 8 with the space
+  test('car number must be 3 letters and 3 numbers, same as the register form', async () => {
+    const message = 'Use 3 letters and 3 numbers: ABC123 or ABC 123';
+    await expect(User.create({ ...driver, userCarNumber: 'AB1' })).rejects.toThrow(message);      // too short
+    await expect(User.create({ ...driver, userCarNumber: 'KAB 1234' })).rejects.toThrow(message); // 4 numbers
+    await expect(User.create({ ...driver, userCarNumber: '123 KAB' })).rejects.toThrow(message);  // wrong order
+    await expect(User.create({ ...driver, userCarNumber: 'KA  123' })).rejects.toThrow(message);  // 2 letters
 
-    const oldPlate = await User.create({ ...driver, userCarNumber: 'ab1' });
-    expect(oldPlate.userCarNumber).toBe('AB1');
+    const noSpace = await User.create({ ...driver, userCarNumber: 'kab123' });
+    expect(noSpace.userCarNumber).toBe('KAB123'); // the space is optional
   });
 });

@@ -13,15 +13,14 @@ const userSchema = new mongoose.Schema
         },
 
         // RQ02: every driver must give a car number
-        // 3-7 characters with the space, same rule as the register form (e.g. "KAB 123", old plates are shorter)
+        // 3 letters, an optional space and 3 numbers, same rule as the register form (e.g. "KAB 123" or "KAB123")
         userCarNumber:
         {
             type: String,
             required: [true, 'Car number is required'],
             trim: true,
             uppercase: true, // "kab 123" is saved as "KAB 123"
-            minlength: [3, 'Car number must have 3-7 characters'],
-            maxlength: [7, 'Car number must have 3-7 characters']
+            match: [/^[A-Z]{3} ?[0-9]{3}$/, 'Use 3 letters and 3 numbers: ABC123 or ABC 123']
         },
 
         // e.g. "Card" (optional)
