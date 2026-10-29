@@ -10,7 +10,7 @@ const NOW = Date.now();
 const fresh = new Date(NOW - 10 * 1000); // sensor reported 10 seconds ago
 const old = new Date(NOW - SENSOR_TIMEOUT_MS - 60 * 1000); // sensor silent for too long
 
-// Example data: 5 spots. Spot 04 has an old sensor, spot 05 has no sensor.
+// Example data: 5 spots. Spot 04 has a sensor that is silent too long, spot 05 has no sensor.
 const spots = [
   { _id: 's1', spotLocation: '01', spotStatus: 'Available' },
   { _id: 's2', spotLocation: '02', spotStatus: 'Taken' },
@@ -19,10 +19,10 @@ const spots = [
   { _id: 's5', spotLocation: '05', spotStatus: 'Available' },
 ];
 const sensors = [
-  { parkingSpotID: 's1', sensorAvailability: 'Available', sensorLocationCoordinates: '34.6786,33.0413', updatedAt: fresh },
-  { parkingSpotID: 's2', sensorAvailability: 'Unavailable', updatedAt: fresh },
-  { parkingSpotID: 's3', sensorAvailability: 'Available', updatedAt: fresh },
-  { parkingSpotID: 's4', sensorAvailability: 'Available', updatedAt: old },
+  { parkingSpotID: 's1', sensorAvailability: 'Available', sensorLocationCoordinates: '34.6786,33.0413', sensorLastSeen: fresh },
+  { parkingSpotID: 's2', sensorAvailability: 'Available', sensorLastSeen: fresh },
+  { parkingSpotID: 's3', sensorAvailability: 'Available', sensorLastSeen: fresh },
+  { parkingSpotID: 's4', sensorAvailability: 'Available', sensorLastSeen: old },
 ];
 
 // Makes ParkingSpot.find().sort().lean() and Sensor.find().lean() return the example data
@@ -35,9 +35,10 @@ afterEach(() => jest.restoreAllMocks());
 
 describe('spotState', () => {
   test('TC-MK07: database status is shown as empty / occupied / reserved', () => {
-    expect(spotState({ spotStatus: 'Available' }, { updatedAt: fresh }, NOW)).toBe('empty');
-    expect(spotState({ spotStatus: 'Taken' }, { updatedAt: fresh }, NOW)).toBe('occupied');
-    expect(spotState({ spotStatus: 'Reserved' }, { updatedAt: fresh }, NOW)).toBe('reserved');
+    const online = { sensorAvailability: 'Available', sensorLastSeen: fresh };
+    expect(spotState({ spotStatus: 'Available' }, online, NOW)).toBe('empty');
+    expect(spotState({ spotStatus: 'Taken' }, online, NOW)).toBe('occupied');
+    expect(spotState({ spotStatus: 'Reserved' }, online, NOW)).toBe('reserved');
   });
 
   test('TC-MK08: a spot without a sensor is unknown', () => {
@@ -45,10 +46,20 @@ describe('spotState', () => {
   });
 
   test('TC-MK09: a spot is unknown when its sensor is silent for more than 2 minutes', () => {
-    const atLimit = { updatedAt: new Date(NOW - SENSOR_TIMEOUT_MS) };
-    const overLimit = { updatedAt: new Date(NOW - SENSOR_TIMEOUT_MS - 1000) };
+    const atLimit = { sensorAvailability: 'Available', sensorLastSeen: new Date(NOW - SENSOR_TIMEOUT_MS) };
+    const overLimit = { sensorAvailability: 'Available', sensorLastSeen: new Date(NOW - SENSOR_TIMEOUT_MS - 1000) };
     expect(spotState({ spotStatus: 'Taken' }, atLimit, NOW)).toBe('occupied');
     expect(spotState({ spotStatus: 'Taken' }, overLimit, NOW)).toBe('unknown');
+  });
+
+  test('TC-MK15: a spot is unknown at once when its sensor is offline', () => {
+    const offline = { sensorAvailability: 'Unavailable', sensorLastSeen: fresh };
+    expect(spotState({ spotStatus: 'Available' }, offline, NOW)).toBe('unknown');
+    expect(spotState({ spotStatus: 'Taken' }, offline, NOW)).toBe('unknown');
+  });
+
+  test('TC-MK16: a sensor that never sent a message (no sensorLastSeen) gives unknown', () => {
+    expect(spotState({ spotStatus: 'Available' }, { sensorAvailability: 'Available' }, NOW)).toBe('unknown');
   });
 });
 
@@ -80,7 +91,7 @@ describe('GET /api/spots', () => {
     const res = await request(app).get('/api/spots?status=free');
 
     expect(res.status).toBe(400);
-    expect(res.body.error).toBe('status must be one of: empty, occupied, reserved, unknown');
+    expect(res.body.message).toBe('status must be one of: empty, occupied, reserved, unknown');
   });
 
   test('TC-MK13: no spots in the database returns an empty list', async () => {
@@ -98,6 +109,7 @@ describe('GET /api/spots', () => {
     const res = await request(app).get('/api/spots');
 
     expect(res.status).toBe(500);
-    expect(res.body.error).toBe('Something went wrong');
+    // the user must not see the inside error ("DB down")
+    expect(JSON.stringify(res.body)).not.toContain('DB down');
   });
 });

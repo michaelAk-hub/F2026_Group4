@@ -2,7 +2,7 @@
 const ParkingSpot = require('../models/parkingSpot');
 const Sensor = require('../models/sensor');
 
-// RQ28: if a sensor has not reported for this long, its spot is shown as Unknown
+// RQ28: if a sensor has not sent a message for this long, its spot is shown as Unknown
 const SENSOR_TIMEOUT_MS = 2 * 60 * 1000; // 2 minutes
 
 // The 4 states of the map (RQ26). They are also the CSS classes used on dashboard.html
@@ -22,9 +22,15 @@ function spotState(spot, sensor, now = Date.now()) {
     return 'unknown';
   }
 
-  // The sensor stopped sending data -> the saved status may be old (RQ28)
-  const lastReport = new Date(sensor.updatedAt).getTime();
-  if (!(now - lastReport <= SENSOR_TIMEOUT_MS)) {
+  // The sensor said it is offline -> unknown at once (RQ28)
+  if (sensor.sensorAvailability === 'Unavailable') {
+    return 'unknown';
+  }
+
+  // No message from the sensor for too long -> the saved status may be old (RQ28).
+  // sensorLastSeen is written by the MQTT code (Member 4) on every sensor message.
+  const lastSeen = new Date(sensor.sensorLastSeen).getTime();
+  if (!(now - lastSeen <= SENSOR_TIMEOUT_MS)) {
     return 'unknown';
   }
 
@@ -38,7 +44,7 @@ function toSpotView(spot, sensor, now) {
     location: spot.spotLocation,
     status: spotState(spot, sensor, now),
     coordinates: sensor && sensor.sensorLocationCoordinates ? sensor.sensorLocationCoordinates : null,
-    lastUpdate: sensor ? sensor.updatedAt : null,
+    lastUpdate: sensor && sensor.sensorLastSeen ? sensor.sensorLastSeen : null,
   };
 }
 
@@ -48,7 +54,7 @@ async function listSpots(req, res, next) {
   try {
     const wanted = req.query.status;
     if (wanted !== undefined && !STATES.includes(wanted)) {
-      return res.status(400).json({ error: 'status must be one of: ' + STATES.join(', ') });
+      return res.status(400).json({ message: 'status must be one of: ' + STATES.join(', ') });
     }
 
     // Read all spots and all sensors (2 queries instead of one per spot)
