@@ -78,6 +78,33 @@ docs/        report, diagrams
 
 The backend validates these at startup (`backend/src/config/env.js`) and stops with a clear error if one is missing or invalid.
 
+## API
+
+All endpoints start with `/api`.
+
+| Method | URL | What it returns |
+|---|---|---|
+| GET | `/api/health` | `{"status":"ok","database":"connected"}` when the server and database work |
+| GET | `/api/spots` | All parking spots with their state for the live map |
+| GET | `/api/spots?status=empty` | Only the spots in one state (`empty`, `occupied`, `reserved`, `unknown`) |
+
+Example answer of `GET /api/spots`:
+
+```json
+{
+  "total": 20,
+  "counts": { "empty": 14, "occupied": 4, "reserved": 1, "unknown": 1 },
+  "spots": [
+    { "id": "6720f1...", "location": "01", "status": "empty", "coordinates": null, "lastUpdate": "2026-10-26T10:00:00.000Z" }
+  ]
+}
+```
+
+- `status` is one of `empty`, `occupied`, `reserved`, `unknown` – the same names as the CSS classes of the map on `dashboard.html`.
+- A spot is `unknown` when it has no sensor or its sensor has not reported for more than 2 minutes (RQ28).
+- `counts` is always for all spots, so the dashboard summary boxes can use it.
+- To try it, fill the database with 20 example spots: `cd backend && npm run seed`, then open http://localhost:3000/api/spots.
+
 ## Branching and commit rules
 
 The instructor only accepts commits that are on `main`, so everyone commits directly to `main`. There is no `dev` branch.
