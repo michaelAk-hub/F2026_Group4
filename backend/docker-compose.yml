@@ -1,0 +1,11 @@
+# Only the MQTT broker. MongoDB runs the way the README describes (local or Atlas).
+# Start: docker compose up -d      Stop: docker compose down
+services:
+  mosquitto:
+    image: eclipse-mosquitto:2
+    container_name: parking-mosquitto
+    ports:
+      - "1883:1883"
+    volumes:
+      - ./mosquitto/config/mosquitto.conf:/mosquitto/config/mosquitto.conf
+    restart: unless-stopped

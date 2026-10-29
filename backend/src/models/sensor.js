@@ -15,6 +15,11 @@ const sensorSchema = new mongoose.Schema
             type: String
         },
 
+        sensorLastSeen:
+        {
+            type: Date
+        },
+
         parkingSpotID:
         {
             type: mongoose.Schema.Types.ObjectId,
