@@ -8,9 +8,9 @@ CSE410 Software Engineering II, European University Cyprus.
 |---|---|---|
 | Maria Antoniou | Member 1 – Frontend (design system, map, reservation flow, reports UI) | MariaAnt135 |
 | Larisa Stefania Opritescu | Member 2 – Frontend (layouts, payment UI, profile, accessibility) | Stefania-Opritescu |
-| Georgios Georgiou | Member 3 – Backend (auth, spots API, reservations, admin API) | giorgos1990 |
+| Georgios Georgiou | Member 3 – Backend (auth, reservations, admin API) | giorgos1990 |
 | Neofytos Papaconstantinou | Member 4 – Backend (sensors/MQTT, payments, violations, load tests) | Fytoss |
-| Michalis Koutoumpas | Member 5 – Full-stack (admin dashboard, SSE stream, profile + reports APIs, QA) | michaelAk-hub |
+| Michalis Koutoumpas | Member 5 – Full-stack (spots API, SSE stream, admin dashboard, profile + reports APIs, QA) | michaelAk-hub |
 
 ## Tech stack
 
@@ -82,11 +82,11 @@ The backend validates these at startup (`backend/src/config/env.js`) and stops w
 
 All endpoints start with `/api`.
 
-| Method | URL | What it returns |
-|---|---|---|
-| GET | `/api/health` | `{"status":"ok","database":"connected"}` when the server and database work |
-| GET | `/api/spots` | All parking spots with their state for the live map |
-| GET | `/api/spots?status=empty` | Only the spots in one state (`empty`, `occupied`, `reserved`, `unknown`) |
+| Method | URL | What it returns | Owner |
+|---|---|---|---|
+| GET | `/api/health` | `{"status":"ok","database":"connected"}` when the server and database work | Member 3 |
+| GET | `/api/spots` | All parking spots with their state for the live map | Member 5 |
+| GET | `/api/spots?status=empty` | Only the spots in one state (`empty`, `occupied`, `reserved`, `unknown`) | Member 5 |
 
 Example answer of `GET /api/spots`:
 
@@ -95,15 +95,16 @@ Example answer of `GET /api/spots`:
   "total": 20,
   "counts": { "empty": 14, "occupied": 4, "reserved": 1, "unknown": 1 },
   "spots": [
-    { "id": "6720f1...", "location": "01", "status": "empty", "coordinates": null, "lastUpdate": "2026-10-26T10:00:00.000Z" }
+    { "id": "6720f1...", "location": "Lot A - Spot 01", "status": "empty", "coordinates": null, "lastUpdate": "2026-10-26T10:00:00.000Z" }
   ]
 }
 ```
 
 - `status` is one of `empty`, `occupied`, `reserved`, `unknown` – the same names as the CSS classes of the map on `dashboard.html`.
-- A spot is `unknown` when it has no sensor or its sensor has not reported for more than 2 minutes (RQ28).
+- A spot is `unknown` when it has no sensor, its sensor is offline (`sensorAvailability: "Unavailable"`), or the sensor has not sent a message for more than 2 minutes (`sensorLastSeen`, RQ28).
+- `lastUpdate` is the time of the last sensor message (`sensorLastSeen`).
 - `counts` is always for all spots, so the dashboard summary boxes can use it.
-- To try it, fill the database with 20 example spots: `cd backend && npm run seed`, then open http://localhost:3000/api/spots.
+- To try it: fill the database with the sensor seed script of Member 4 (`seed-sensors`), start the sensor simulator so the sensors keep sending messages, start the API with `npm start` and open http://localhost:3000/api/spots.
 
 ## Branching and commit rules
 
