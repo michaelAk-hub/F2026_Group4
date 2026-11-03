@@ -2,7 +2,7 @@ const app = require('./app');
 const { loadConfig } = require('./config/env');
 const { connectDB } = require('./config/db');
 const {startMqtt} = require('./services/mqttClient');
-
+const {sensorBackgroundCheck} = require('./services/sensorService');
 // First check the settings, then connect to the database, then start the server.
 async function start() {
   try {
@@ -13,6 +13,7 @@ async function start() {
       console.log(`API running on http://localhost:${config.port}/api`);
     });
     startMqtt(config.mqttUrl);
+    setInterval(() => sensorBackgroundCheck().catch(console.error), 60 * 1000);
   } catch (err) {
     console.error('Could not start the server:', err.message);
     process.exit(1);
