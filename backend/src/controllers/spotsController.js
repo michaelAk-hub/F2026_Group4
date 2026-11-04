@@ -48,6 +48,31 @@ function toSpotView(spot, sensor, now) {
   };
 }
 
+// Reads all spots and their sensors and returns what the map needs.
+// Used by GET /api/spots and by the live stream (services/spotStream.js).
+async function loadSpots() {
+  // Read all spots and all sensors (2 queries instead of one per spot)
+  const [spots, sensors] = await Promise.all([
+    ParkingSpot.find().sort({ spotLocation: 1 }).lean(),
+    Sensor.find().lean(),
+  ]);
+
+  // Find the sensor of each spot quickly: spot id -> sensor
+  const sensorOfSpot = new Map(sensors.map((s) => [String(s.parkingSpotID), s]));
+
+  const now = Date.now();
+  const all = spots.map((spot) => toSpotView(spot, sensorOfSpot.get(String(spot._id)), now));
+
+  return { total: all.length, counts: countStates(all), spots: all };
+}
+
+// Numbers for the summary boxes of the dashboard
+function countStates(spots) {
+  const counts = { empty: 0, occupied: 0, reserved: 0, unknown: 0 };
+  spots.forEach((s) => { counts[s.status] += 1; });
+  return counts;
+}
+
 // GET /api/spots          -> all spots
 // GET /api/spots?status=empty -> only the spots in that state
 async function listSpots(req, res, next) {
@@ -57,28 +82,17 @@ async function listSpots(req, res, next) {
       return res.status(400).json({ message: 'status must be one of: ' + STATES.join(', ') });
     }
 
-    // Read all spots and all sensors (2 queries instead of one per spot)
-    const [spots, sensors] = await Promise.all([
-      ParkingSpot.find().sort({ spotLocation: 1 }).lean(),
-      Sensor.find().lean(),
-    ]);
+    const result = await loadSpots();
 
-    // Find the sensor of each spot quickly: spot id -> sensor
-    const sensorOfSpot = new Map(sensors.map((s) => [String(s.parkingSpotID), s]));
+    // The counts are always for ALL spots, also when a filter is used
+    if (wanted) {
+      result.spots = result.spots.filter((s) => s.status === wanted);
+    }
 
-    const now = Date.now();
-    const all = spots.map((spot) => toSpotView(spot, sensorOfSpot.get(String(spot._id)), now));
-
-    // Numbers for the summary boxes of the dashboard (always for ALL spots)
-    const counts = { empty: 0, occupied: 0, reserved: 0, unknown: 0 };
-    all.forEach((s) => { counts[s.status] += 1; });
-
-    const shown = wanted ? all.filter((s) => s.status === wanted) : all;
-
-    res.json({ total: all.length, counts, spots: shown });
+    res.json(result);
   } catch (err) {
     next(err); // database problem -> error handler sends 500
   }
 }
 
-module.exports = { listSpots, spotState, toSpotView, STATES, SENSOR_TIMEOUT_MS };
+module.exports = { listSpots, loadSpots, spotState, toSpotView, STATES, SENSOR_TIMEOUT_MS };
