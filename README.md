@@ -87,6 +87,7 @@ All endpoints start with `/api`.
 | GET | `/api/health` | `{"status":"ok","database":"connected"}` when the server and database work | Member 3 |
 | GET | `/api/spots` | All parking spots with their state for the live map | Member 5 |
 | GET | `/api/spots?status=empty` | Only the spots in one state (`empty`, `occupied`, `reserved`, `unknown`) | Member 5 |
+| GET | `/api/spots/stream` | Live updates of the spots (Server-Sent Events) | Member 5 |
 
 Example answer of `GET /api/spots`:
 
@@ -105,6 +106,29 @@ Example answer of `GET /api/spots`:
 - `lastUpdate` is the time of the last sensor message (`sensorLastSeen`).
 - `counts` is always for all spots, so the dashboard summary boxes can use it.
 - To try it: fill the database with the sensor seed script of Member 4 (`seed-sensors`), start the sensor simulator so the sensors keep sending messages, start the API with `npm start` and open http://localhost:3000/api/spots.
+
+### Live updates: `GET /api/spots/stream`
+
+The map stays open and the server sends a message every time a spot changes (Server-Sent Events). In the browser:
+
+```js
+const stream = new EventSource('http://localhost:3000/api/spots/stream');
+
+// 1. Right after connecting: all spots, the same data as GET /api/spots
+stream.addEventListener('snapshot', (e) => {
+  const data = JSON.parse(e.data); // { total, counts, spots }
+});
+
+// 2. Then, only when something changes: the changed spots and the new counts
+stream.addEventListener('update', (e) => {
+  const data = JSON.parse(e.data); // { total, counts, spots: [changed spots], removed: [ids] }
+});
+```
+
+- The server checks the spots every second, so a change reaches the map within the 5 seconds of RQ22. One check is shared by all open maps.
+- A spot that becomes `unknown` because its sensor went silent (RQ28) is also sent as an update.
+- A new sensor time alone (heartbeat) is not sent, only changes that the map shows.
+- If the connection drops, the browser reconnects by itself after 3 seconds and gets a new `snapshot`.
 
 ## Branching and commit rules
 
