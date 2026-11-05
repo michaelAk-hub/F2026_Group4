@@ -89,20 +89,32 @@
   gap: 16px;
 }
 
-/* legend */
+/* legend + filter buttons */
 .legend {
   display: flex;
-  gap: 16px;
-  list-style: none;
-  margin: 0 0 16px;
-  padding: 0;
-  font-size: 0.85rem;
+  gap: 8px;
+  margin-bottom: 16px;
 }
-.legend span {
+.legend button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: white;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+.legend button.active {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  font-weight: bold;
+}
+.dot {
   display: inline-block;
   width: 12px;
   height: 12px;
-  margin-right: 6px;
   border-radius: 3px;
 }
 
@@ -140,12 +152,47 @@
   font-size: 1.2rem;
   font-weight: bold;
   border-left: 3px solid white;
+  cursor: pointer;
+}
+/* the spot the user clicked */
+.spot.selected {
+  outline: 4px solid #4da3ff;
+  outline-offset: -4px;
+}
+/* spots hidden by the filter keep their place, so the car park keeps its shape */
+.spot.hidden-spot {
+  visibility: hidden;
 }
 .top-row .spot {
   border-top: 3px solid white;
 }
 .bottom-row .spot {
   border-bottom: 3px solid white;
+}
+
+/* details of the clicked spot */
+.spot-details {
+  margin-top: 16px;
+  padding: 16px;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+}
+.spot-details h3 {
+  margin: 0 0 8px;
+  color: var(--color-navy);
+}
+.spot-details p {
+  margin: 4px 0;
+}
+.spot-details .btn {
+  width: auto;
+  display: inline-block;
+  margin-top: 8px;
+  padding: 10px 18px;
+}
+/* without this, display: inline-block above would show the button even when it is hidden */
+.spot-details .btn[hidden] {
+  display: none;
 }
 
 /* the road between the two rows */

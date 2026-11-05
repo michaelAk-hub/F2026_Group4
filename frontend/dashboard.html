@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- Driver dashboard - Stefania (Week 1, new design with the left menu) -->
+<!-- Driver dashboard - Stefania (Week 1, new design in week 2, spot details and filter in week 3) -->
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -62,18 +62,32 @@
         <section class="box" id="map-section">
           <h2>Parking Map</h2>
 
-          <ul class="legend" id="legend">
-            <li><span class="empty"></span>Empty</li>
-            <li><span class="occupied"></span>Occupied</li>
-            <li><span class="reserved"></span>Reserved</li>
-            <li><span class="unknown"></span>Unknown</li>
-          </ul>
+          <!-- Stefania (Week 3): the legend is also the filter.
+               Clicking a button shows only the spots with that status -->
+          <div class="legend" id="legend">
+            <button type="button" class="active" data-status="all">All</button>
+            <button type="button" data-status="empty"><span class="dot empty"></span>Empty</button>
+            <button type="button" data-status="occupied"><span class="dot occupied"></span>Occupied</button>
+            <button type="button" data-status="reserved"><span class="dot reserved"></span>Reserved</button>
+            <button type="button" data-status="unknown"><span class="dot unknown"></span>Unknown</button>
+          </div>
 
           <!-- Maria (Week 3): map.js creates the spots after loading the API. -->
           <p id="map-message" role="status" aria-live="polite">
             Loading parking spots...
           </p>
           <div class="map" id="map" hidden></div>
+
+          <!-- Stefania (Week 3): details of the spot the user clicks on -->
+          <div class="spot-details" id="spot-details">
+            <p id="detail-empty">Click on a spot to see its details.</p>
+            <div id="detail-info" hidden>
+              <h3>Spot <span id="detail-id"></span></h3>
+              <p>Status: <b id="detail-status"></b></p>
+              <p id="detail-message"></p>
+              <a class="btn" id="detail-reserve" href="reservation.html">RESERVE THIS SPOT</a>
+            </div>
+          </div>
         </section>
 
         <section class="box upcoming">
@@ -94,5 +108,10 @@
     <!-- Maria (Week 3): use the shared API address, then load the map. -->
     <script src="js/api.js"></script>
     <script src="js/map.js"></script>
+    <!-- Stefania (Week 3): spot details and filter on top of the map -->
+    <script src="js/spots.js"></script>
+    <script>
+      setupSpots();
+    </script>
   </body>
 </html>

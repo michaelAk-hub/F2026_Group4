@@ -67,12 +67,11 @@ describe("dashboard page", () => {
   });
 
   test("legend has the 4 spot states", () => {
-    const items = document.querySelectorAll("#legend li");
-    expect(items.length).toBe(4);
-    expect(items[0].textContent).toBe("Empty");
-    expect(items[1].textContent).toBe("Occupied");
-    expect(items[2].textContent).toBe("Reserved");
-    expect(items[3].textContent).toBe("Unknown");
+    const buttons = document.querySelectorAll("#legend button");
+    expect(buttons[1].textContent).toBe("Empty");
+    expect(buttons[2].textContent).toBe("Occupied");
+    expect(buttons[3].textContent).toBe("Reserved");
+    expect(buttons[4].textContent).toBe("Unknown");
   });
 
   // Maria (Week 3): dynamic spots are checked in tests/frontend/map.test.cjs.
