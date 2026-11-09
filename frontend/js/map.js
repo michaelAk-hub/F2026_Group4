@@ -1,13 +1,13 @@
 /*
-  map.js - Maria Antoniou (Week 3)
-  RQ05 / UC03: load the parking map from GET /api/spots.
-  RQ22: ask for current data every 2 seconds, aiming for the report's
-  5-second display target. Real sensor-to-screen timing still needs testing.
+  map.js - Maria Antoniou
+  RQ05 / UC03: display the parking spots and summary counters.
+  RQ22: receive live updates from /api/spots/stream using EventSource.
+  The five-second sensor-to-screen target still needs a timed check.
   RQ26: use the four status colours from Stefania's layout.css.
-  RQ28: the BACKEND decides when a sensor's spot is Unknown.
+  RQ28: the backend decides when a sensor's spot is Unknown.
 
-  Keep the car-park row layout described in the report. Coordinates are
-  shown exactly as returned by the API, without guessing their format.
+  The map uses the car-park row layout. Coordinates from the API
+  appear in the hover text and accessible label.
 */
 
 var mapLoading = false;
@@ -15,8 +15,10 @@ var mapHasData = false;
 var mapTimer = null;
 var mapRequest = null;
 var mapActive = false;
+var mapStream = null;
+var streamSpots = null;
 
-// Check the API reply before replacing the last successful map.
+// Check the complete map before showing it to the driver.
 function validParkingData(data) {
   if (
     !data ||
@@ -25,14 +27,17 @@ function validParkingData(data) {
     !Number.isInteger(data.total) ||
     data.total < 0 ||
     data.total !== data.spots.length
-  )
+  ) {
     return false;
+  }
 
   var states = ["empty", "occupied", "reserved", "unknown"];
   var counted = { empty: 0, occupied: 0, reserved: 0, unknown: 0 };
   var ids = new Set();
+
   for (var i = 0; i < data.spots.length; i++) {
     var spot = data.spots[i];
+
     if (
       !spot ||
       typeof spot.id !== "string" ||
@@ -41,16 +46,21 @@ function validParkingData(data) {
       typeof spot.location !== "string" ||
       !states.includes(spot.status) ||
       (spot.coordinates != null && typeof spot.coordinates !== "string")
-    )
+    ) {
       return false;
+    }
+
     ids.add(spot.id);
     counted[spot.status]++;
   }
+
   for (var j = 0; j < states.length; j++) {
     var count = data.counts[states[j]];
-    if (!Number.isInteger(count) || count < 0 || count !== counted[states[j]])
+    if (!Number.isInteger(count) || count < 0 || count !== counted[states[j]]) {
       return false;
+    }
   }
+
   return true;
 }
 
@@ -61,7 +71,7 @@ function drawParkingMap(data) {
   var row;
 
   for (var i = 0; i < data.spots.length; i++) {
-    // Keep 10 spaces per row, and support additional spots (RQ32).
+    // Start a new row every ten spots.
     if (i % 10 === 0) {
       row = document.createElement("div");
       row.className = "parking-row " + (i === 0 ? "top-row" : "bottom-row");
@@ -72,88 +82,111 @@ function drawParkingMap(data) {
     var tile = document.createElement("div");
     tile.className = "spot " + spot.status;
     tile.dataset.spotId = spot.id;
-    // Seeded locations look like "Lot A - Spot 01". Keep other names in full.
+
+    // "Lot A - Spot 01" appears as "01". Other locations keep their full names.
     var label = spot.location.match(/ - Spot (\d+)$/);
     tile.textContent = label ? label[1] : spot.location;
-    // The title exposes the actual location and coordinates on hover.
-    // Missing coordinates stay unavailable; we do not invent map positions.
+
     tile.title =
       spot.location +
       " - " +
       spot.status +
       "\nCoordinates: " +
       (spot.coordinates || "unavailable");
+
     tile.setAttribute("aria-label", tile.title);
     row.appendChild(tile);
 
-    // Keep Stefania's road between the first two rows.
+    // Put the driving lane between the first and second rows.
     if (i === 9 && data.spots.length > 10) {
       var lane = document.createElement("div");
       lane.className = "driving-lane";
+
       var entrance = document.createElement("span");
       entrance.textContent = "ENTRANCE";
+
       var line = document.createElement("div");
       line.className = "lane-line";
+
       var exit = document.createElement("span");
       exit.textContent = "EXIT";
+
       lane.append(entrance, line, exit);
       rows.appendChild(lane);
     }
   }
 
-  // Replace spots only after the complete reply has been checked.
-  // textContent above treats location names as text, not as HTML.
   map.replaceChildren(rows);
   map.hidden = data.spots.length === 0;
+
   numbers[0].textContent = data.total;
   numbers[1].textContent = data.counts.empty;
   numbers[2].textContent = data.counts.occupied;
   numbers[3].textContent = data.counts.reserved;
 }
 
-async function loadParkingMap() {
-  // Do not overlap requests, or load data for a user who has logged out.
-  if (!mapActive || mapLoading) return;
+function displayParkingData(data) {
+  drawParkingMap(data);
+  mapHasData = true;
+
+  document.getElementById("map-message").textContent =
+    data.spots.length === 0 ? "No parking spots are available to display." : "";
+}
+
+// Stop updates and clear the driver's map if the login has ended.
+function checkDriver() {
   if (
-    !localStorage.getItem("token") ||
-    localStorage.getItem("role") !== "driver"
+    localStorage.getItem("token") &&
+    localStorage.getItem("role") === "driver"
   ) {
-    stopParkingMap();
-    document.getElementById("map").replaceChildren();
-    document.getElementById("map").hidden = true;
-    var numbers = document.querySelectorAll("#summary .numbers b");
-    for (var i = 0; i < numbers.length; i++) numbers[i].textContent = "—";
-    document.getElementById("map-message").textContent = "Please log in first.";
-    return;
+    return true;
   }
+
+  stopParkingMap();
+  mapHasData = false;
+
+  var map = document.getElementById("map");
+  map.replaceChildren();
+  map.hidden = true;
+
+  var numbers = document.querySelectorAll("#summary .numbers b");
+  for (var i = 0; i < numbers.length; i++) {
+    numbers[i].textContent = "—";
+  }
+
+  document.getElementById("map-message").textContent = "Please log in first.";
+  return false;
+}
+
+// Load a complete map when the browser needs to use the regular spots API.
+async function loadParkingMap() {
+  if (!mapActive || mapLoading || !checkDriver()) return;
+
   mapLoading = true;
-  mapRequest = new AbortController();
-  // A stalled connection should not block all later refreshes.
+  var request = new AbortController();
+  mapRequest = request;
+
   var timeout = setTimeout(function () {
-    mapRequest.abort();
+    request.abort();
   }, 2000);
 
   try {
     var response = await fetch(API_BASE_URL + "/spots", {
       headers: { Authorization: "Bearer " + localStorage.getItem("token") },
-      signal: mapRequest.signal,
+      signal: request.signal,
       cache: "no-store",
     });
-    if (!response.ok) throw new Error("Cannot load parking spots.");
-    var data = await response.json();
-    if (!validParkingData(data)) throw new Error("Unexpected parking data.");
-    if (!mapActive) return; // The user may have left while the request was running.
 
-    drawParkingMap(data);
-    mapHasData = true;
-    document.getElementById("map-message").textContent =
-      data.spots.length === 0
-        ? "No parking spots are available to display."
-        : "";
+    if (!response.ok) throw new Error("Cannot load parking spots.");
+
+    var data = await response.json();
+    if (!mapActive || request.signal.aborted || !checkDriver()) return;
+    if (!validParkingData(data)) throw new Error("Unexpected parking data.");
+
+    displayParkingData(data);
   } catch (error) {
-    if (!mapActive) return;
-    // UC03 allows the latest known status with an explicit warning.
-    // Do not label a connection failure as a genuine Empty/Unknown sensor state.
+    if (!mapActive || !checkDriver()) return;
+
     document.getElementById("map-message").textContent = mapHasData
       ? "Sensor data currently unavailable. Showing the latest known parking status."
       : "Sensor data currently unavailable. Cannot load parking spots.";
@@ -164,27 +197,117 @@ async function loadParkingMap() {
   }
 }
 
-function startParkingMap() {
-  if (mapActive) return; // Only create one refresh timer.
-  if (
-    !localStorage.getItem("token") ||
-    localStorage.getItem("role") !== "driver"
-  )
-    return;
-  mapActive = true;
+// Use the original two-second refresh if streaming is unavailable.
+function startPolling() {
   var loading = loadParkingMap();
   mapTimer = setInterval(loadParkingMap, 2000);
   return loading;
 }
 
+function openParkingStream() {
+  var source = new EventSource(API_BASE_URL + "/spots/stream");
+  mapStream = source;
+
+  function receive(event) {
+    if (source !== mapStream || !checkDriver()) return;
+
+    try {
+      var data = JSON.parse(event.data);
+
+      // A snapshot is already a complete map. An update contains changes.
+      if (event.type === "update") {
+        if (
+          !streamSpots ||
+          !Array.isArray(data.spots) ||
+          !Array.isArray(data.removed)
+        ) {
+          throw new Error("Incomplete parking update.");
+        }
+
+        // Start with the previous map so the other spots stay visible.
+        var byId = new Map(streamSpots.map((spot) => [spot.id, spot]));
+
+        for (var id of data.removed) {
+          byId.delete(id);
+        }
+
+        for (var spot of data.spots) {
+          byId.set(spot.id, spot);
+        }
+
+        data.spots = Array.from(byId.values());
+      }
+
+      if (!validParkingData(data)) throw new Error("Unexpected parking data.");
+
+      displayParkingData(data);
+      streamSpots = data.spots;
+    } catch (error) {
+      // If an update is incomplete, recover with a complete map from the API.
+      source.close();
+      mapStream = null;
+      streamSpots = null;
+      startPolling();
+    }
+  }
+
+  source.addEventListener("snapshot", receive);
+  source.addEventListener("update", receive);
+
+  source.onerror = function () {
+    if (source !== mapStream || !checkDriver()) return;
+
+    streamSpots = null;
+    document.getElementById("map-message").textContent = mapHasData
+      ? "Live updates interrupted. Showing the latest known parking status."
+      : "Waiting for the parking stream.";
+
+    // After a temporary interruption, EventSource reconnects automatically.
+    // If it closes permanently, use the regular spots API.
+    if (source.readyState === EventSource.CLOSED) {
+      mapStream = null;
+      startPolling();
+    }
+  };
+}
+
+function startParkingMap() {
+  if (mapActive) return;
+  if (
+    !localStorage.getItem("token") ||
+    localStorage.getItem("role") !== "driver"
+  ) {
+    return;
+  }
+
+  mapActive = true;
+
+  if (typeof EventSource === "function") {
+    openParkingStream();
+    return;
+  }
+
+  return startPolling();
+}
+
 function stopParkingMap() {
   mapActive = false;
+
+  if (mapStream) mapStream.close();
+  mapStream = null;
+  streamSpots = null;
+
   clearInterval(mapTimer);
   mapTimer = null;
+
   if (mapRequest) mapRequest.abort();
 }
 
-// Stop requests on leaving. Restart if the browser restores this page with Back.
+// Handle logout in another tab, leaving the page and returning with Back.
+window.addEventListener("storage", function () {
+  if (mapActive) checkDriver();
+});
 window.addEventListener("pagehide", stopParkingMap);
 window.addEventListener("pageshow", startParkingMap);
+
 startParkingMap();
