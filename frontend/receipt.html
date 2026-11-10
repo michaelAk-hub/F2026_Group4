@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<!-- Receipt page after the payment - Stefania (Week 4) -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Receipt - Smart Parking</title>
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/layout.css">
+</head>
+<body>
+  <div class="app">
+    <nav class="sidebar">
+      <div class="brand-name"><span class="logo">P</span><span>SMART PARKING<small>MANAGEMENT SYSTEM</small></span></div>
+      <ul class="menu-links">
+        <li><a href="dashboard.html">Dashboard</a></li>
+        <li><a href="reservation.html">Reserve</a></li>
+        <li><a href="my-reservations.html">My Reservations</a></li>
+        <li><a href="login.html" onclick="logout(); return false;">Logout</a></li>
+      </ul>
+    </nav>
+
+    <main class="content">
+      <h1>Payment Receipt</h1>
+      <p class="subtitle">Your reservation is paid</p>
+
+      <!-- shown when there is no payment to show -->
+      <section class="box" id="no-receipt" hidden>
+        <p>No payment was found. Please reserve a spot first.</p>
+        <a class="btn" href="dashboard.html">Go to the dashboard</a>
+      </section>
+
+      <section class="ticket receipt" id="receipt" hidden>
+        <div class="ticket-top">
+          <div>
+            <p class="ticket-label">PAYMENT RECEIPT</p>
+            <h2>City Center Parking</h2>
+          </div>
+          <span class="ticket-spot" id="receipt-spot"></span>
+        </div>
+        <div class="ticket-line"></div>
+        <div class="ticket-details">
+          <div><span>Date</span><b id="receipt-date"></b></div>
+          <div><span>Time</span><b id="receipt-time"></b></div>
+          <div><span>Duration</span><b id="receipt-duration"></b></div>
+          <div><span>Reservation ID</span><b id="receipt-reservation-id"></b></div>
+          <div><span>Payment ID</span><b id="receipt-payment-id"></b></div>
+          <div><span>Card</span><b id="receipt-card"></b></div>
+        </div>
+        <div class="ticket-total"><span>Amount paid</span><b id="receipt-amount"></b></div>
+        <p class="receipt-status">Status: <b id="receipt-status"></b></p>
+      </section>
+
+      <div class="form-buttons receipt-buttons">
+        <a class="back-btn" href="dashboard.html">Back to dashboard</a>
+        <a class="btn" href="my-reservations.html">My Reservations</a>
+      </div>
+    </main>
+  </div>
+
+  <!-- only a logged in driver can stay on this page -->
+  <script src="js/auth.js"></script>
+  <script>
+    requireRole("driver");
+  </script>
+
+  <script src="js/receipt.js"></script>
+  <script>
+    loadReceipt();
+  </script>
+</body>
+</html>

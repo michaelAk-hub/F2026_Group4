@@ -388,3 +388,29 @@ th {
   text-align: center;
   color: var(--color-muted);
 }
+
+/* Week 4 - payment message and receipt page - Stefania */
+.payment-message {
+  margin: 10px 0 0;
+  text-align: center;
+  color: var(--color-navy);
+}
+.receipt {
+  max-width: 640px;
+}
+/* the ids are long, so they go to a new line if needed */
+.receipt .ticket-details b {
+  word-break: break-all;
+}
+.receipt-status {
+  margin: 0;
+  padding: 12px 24px;
+  color: #a9b6d3;
+}
+.receipt-status b {
+  color: #7ee08a;
+}
+.receipt-buttons {
+  max-width: 640px;
+  margin-top: 16px;
+}

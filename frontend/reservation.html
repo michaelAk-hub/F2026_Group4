@@ -83,11 +83,12 @@
                 <p class="error" data-for="cvv"></p>
               </div>
             </div>
-            <!-- the button does nothing yet, the payment is added in week 4 -->
+            <!-- Week 4: js/payment.js checks the card and pays -->
             <div class="form-buttons">
               <a class="back-btn" href="dashboard.html">Back</a>
-              <button class="btn" type="button">PAY €4.00</button>
+              <button class="btn" id="pay-button" type="button">PAY €4.00</button>
             </div>
+            <p id="payment-message" class="payment-message" role="status"></p>
             <p class="note">Your full card details are not stored.</p>
           </form>
         </section>
@@ -103,6 +104,10 @@
 
   <script src="js/api.js"></script>
   <script src="js/reserve.js"></script>
+  <script src="js/payment.js"></script>
+  <script>
+    setupPayment();
+  </script>
 
 </body>
 </html>
