@@ -54,7 +54,9 @@ function showSpotDetails(spot) {
   document.getElementById("detail-message").textContent = statusMessage(status);
 
   // the Reserve link is only for free spots
-  document.getElementById("detail-reserve").hidden = status !== "empty";
+var reserveLink = document.getElementById("detail-reserve");
+reserveLink.hidden = status !== "empty";
+reserveLink.href = "reservation.html?spotId=" + encodeURIComponent(selectedId);
 
   document.getElementById("detail-empty").hidden = true;
   document.getElementById("detail-info").hidden = false;

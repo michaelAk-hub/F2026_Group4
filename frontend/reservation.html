@@ -35,12 +35,27 @@
             <span class="ticket-spot">05</span>
           </div>
           <div class="ticket-line"></div>
+          <!-- Week 4: the driver chooses the reservation start and end times. -->
+          <div class="field">
+            <label for="startTime">Start date and time</label>
+            <input id="startTime" type="datetime-local" required>
+          </div>
+
+          <div class="field">
+            <label for="endTime">End date and time</label>
+            <input id="endTime" type="datetime-local" required>
+          </div>
+
           <div class="ticket-details">
             <div><span>Date</span><b>26 Oct 2026</b></div>
             <div><span>Time</span><b>14:00 - 16:00</b></div>
             <div><span>Duration</span><b>2 hours</b></div>
           </div>
           <div class="ticket-total"><span>Total amount</span><b>€4.00</b></div>
+          <button id="create-reservation" class="btn" type="button">
+            Continue to payment
+          </button>
+          <p id="reservation-message" role="status"></p>
         </section>
 
         <section class="box" id="payment">
@@ -85,5 +100,9 @@
   <script>
     requireRole("driver");
   </script>
+
+  <script src="js/api.js"></script>
+  <script src="js/reserve.js"></script>
+
 </body>
 </html>
