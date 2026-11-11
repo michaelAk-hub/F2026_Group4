@@ -16,4 +16,7 @@ router.use('/spots', require('./spots'));
 // /api/reservations (Member 3, week 4)
 router.use('/reservations', require('./reservations'));
 
+// /api/payments (Member 4, week 4)
+router.use('/payments', require('./payments'));
+
 module.exports = router;
