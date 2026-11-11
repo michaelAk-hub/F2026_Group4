@@ -3,6 +3,7 @@ const { loadConfig } = require('./config/env');
 const { connectDB } = require('./config/db');
 const {startMqtt} = require('./services/mqttClient');
 const {sensorBackgroundCheck} = require('./services/sensorService');
+const { runReservationJob } = require('./services/reservationJob');
 // First check the settings, then connect to the database, then start the server.
 async function start() {
   try {
@@ -14,6 +15,8 @@ async function start() {
     });
     startMqtt(config.mqttUrl);
     setInterval(() => sensorBackgroundCheck().catch(console.error), 60 * 1000);
+    // every minute: delete unpaid reservations after 15 minutes, free spots of ended reservations
+    setInterval(() => runReservationJob().catch(console.error), 60 * 1000);
   } catch (err) {
     console.error('Could not start the server:', err.message);
     process.exit(1);
