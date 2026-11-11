@@ -252,7 +252,7 @@ describe('Integration: register -> map -> reserve -> pay', () => {
 
   // ---------------- Bugs found by the integration test (see docs/bug-list-week4.md) ----------------
 
-  test.failing('TC-MK39 / BUG-01: two drivers who reserve the same spot at the same moment do not both get it (RQ08)', async () => {
+  test('TC-MK39 / BUG-01: two drivers who reserve the same spot at the same moment do not both get it (RQ08)', async () => {
     const a = await registerAndLogin('maria@example.com');
     const b = await registerAndLogin('nikos@example.com');
     const start = Date.now() + HOUR;
@@ -269,7 +269,7 @@ describe('Integration: register -> map -> reserve -> pay', () => {
     expect((await mapStatus(spot1)).status).toBe('empty');
   });
 
-  test.failing('TC-MK41 / BUG-03: a very short reservation is refused, or it can be paid (RQ09)', async () => {
+  test('TC-MK41 / BUG-03: a very short reservation is refused, or it can be paid (RQ09)', async () => {
     const { token } = await registerAndLogin('maria@example.com');
     jest.spyOn(console, 'error').mockImplementation(() => {});
     const res = await reserve(token, spot1.id, Date.now() + HOUR, 2 / 3600); // 2 seconds -> price 0.00

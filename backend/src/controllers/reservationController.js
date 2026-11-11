@@ -10,6 +10,9 @@ const PRICE_PER_HOUR = 2;
 // A reservation can be at most one day long
 const MAX_HOURS = 24;
 
+// and at least 15 minutes, so the price is never 0.00 (BUG-03)
+const MIN_MINUTES = 15;
+
 // Small helper: true if the text is a real date
 function isValidDate(date) {
   return !isNaN(date.getTime());
@@ -65,6 +68,9 @@ async function createReservation(req, res) {
   if (hours > MAX_HOURS) {
     return res.status(400).json({ message: 'A reservation can be at most 24 hours.' });
   }
+  if (hours * 60 < MIN_MINUTES) {
+    return res.status(400).json({ message: 'A reservation must be at least 15 minutes.' });
+  }
 
   // Double-booking protection: no other reservation of this spot may overlap these times.
   // Two time ranges overlap when one starts before the other ends.
@@ -94,6 +100,22 @@ async function createReservation(req, res) {
       parkingSpotID: spot._id,
       paymentID: payment._id,
     });
+
+    // Double-booking protection, second check (BUG-01): two drivers who reserve at the same
+    // moment can both pass the first check before any of them is saved. So we look again
+    // after saving: the reservation that was saved first keeps the time, the later one
+    // (a bigger _id) is removed again and gets 409.
+    const earlier = await Reservation.exists({
+      _id: { $lt: reservation._id },
+      parkingSpotID: spot._id,
+      reservationStartTime: { $lt: end },
+      reservationEndTime: { $gt: start },
+    });
+    if (earlier) {
+      await Reservation.deleteOne({ _id: reservation._id });
+      await Payment.deleteOne({ _id: payment._id });
+      return res.status(409).json({ message: 'This spot is already reserved for that time.' });
+    }
 
     res.status(201).json({
       message: 'Reservation created. Please pay to confirm it.',

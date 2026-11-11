@@ -108,6 +108,27 @@ describe('Reservation API', () => {
     expect(await Reservation.countDocuments()).toBe(1);
   });
 
+  test('TC-G60: two drivers who reserve the same spot at the same moment do not both get it (RQ08)', async () => {
+    const otherToken = await loginDriver('nikos@example.com');
+
+    // both requests are sent together, so both pass the first overlap check
+    const results = await Promise.all([reserve(token, spot.id), reserve(otherToken, spot.id)]);
+
+    expect(results.map((r) => r.status).sort()).toEqual([201, 409]);
+    expect(await Reservation.countDocuments()).toBe(1);
+    expect(await Payment.countDocuments()).toBe(1); // the payment of the removed one is deleted too
+  });
+
+  test('TC-G61: a reservation shorter than 15 minutes is rejected, so the price is never 0.00 (RQ09)', async () => {
+    const tooShort = await reserve(token, spot.id, 1, 2 / 3600); // 2 seconds
+    expect(tooShort.status).toBe(400);
+    expect(tooShort.body.message).toBe('A reservation must be at least 15 minutes.');
+
+    const fifteen = await reserve(token, spot.id, 1, 0.25); // exactly 15 minutes is allowed
+    expect(fifteen.status).toBe(201);
+    expect(fifteen.body.reservation.amount).toBe(0.5);
+  });
+
   test('back-to-back times and other spots are allowed', async () => {
     await reserve(token, spot.id, 1, 2); // from +1h to +3h
 
