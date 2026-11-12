@@ -1,6 +1,7 @@
 // Receipt page - Stefania (Week 4)
 // payment.js saves the receipt in sessionStorage after the payment,
 // this file reads it and shows it (RQ11).
+// The receipt number comes from the payment API (Week 5).
 
 // put the receipt values in the page
 function showReceipt(receipt) {
@@ -11,6 +12,7 @@ function showReceipt(receipt) {
   document.getElementById("receipt-reservation-id").textContent = receipt.reservationId;
   document.getElementById("receipt-payment-id").textContent = receipt.paymentId;
   document.getElementById("receipt-card").textContent = receipt.card;
+  document.getElementById("receipt-number").textContent = receipt.receiptId;
   document.getElementById("receipt-amount").textContent = receipt.amount;
   document.getElementById("receipt-status").textContent = receipt.status;
 

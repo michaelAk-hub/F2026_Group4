@@ -25,7 +25,7 @@ afterEach(() => {
   localStorage.clear();
 });
 
-test.failing('TC-MK42 / BUG-06: PAY sends the payment to POST /api/payments and then confirms the reservation (RQ09, RQ10)', async () => {
+test('TC-MK42 / BUG-06: PAY sends the payment to POST /api/payments and then confirms the reservation (RQ09, RQ10)', async () => {
   await payment.sendPayment('reservation-1', 'payment-1', '**** **** **** 4242');
 
   const urls = global.fetch.mock.calls.map((call) => String(call[0]));

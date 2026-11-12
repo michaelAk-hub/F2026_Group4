@@ -1,7 +1,7 @@
 /**
  * @jest-environment jsdom
  */
-// Tests for the receipt page - Stefania (Week 4)
+// Tests for the receipt page - Stefania (Week 4, receipt number added in Week 5)
 
 const fs = require("fs");
 const path = require("path");
@@ -16,7 +16,8 @@ const savedReceipt = {
   amount: "€4.00",
   reservationId: "res123",
   paymentId: "pay456",
-  status: "Complete",
+  receiptId: "RCPT-12345ABCDE",
+  status: "Paid",
   card: "**** **** **** 1111"
 };
 
@@ -41,12 +42,18 @@ describe("receipt (RQ11)", () => {
     expect(document.getElementById("receipt-payment-id").textContent).toBe("pay456");
   });
 
+  test("the receipt shows the receipt number from the payment API", () => {
+    sessionStorage.setItem("receipt", JSON.stringify(savedReceipt));
+    receipt.loadReceipt();
+    expect(document.getElementById("receipt-number").textContent).toBe("RCPT-12345ABCDE");
+  });
+
   test("the receipt shows the spot, amount, status and the masked card", () => {
     sessionStorage.setItem("receipt", JSON.stringify(savedReceipt));
     receipt.loadReceipt();
     expect(document.getElementById("receipt-spot").textContent).toBe("05");
     expect(document.getElementById("receipt-amount").textContent).toBe("€4.00");
-    expect(document.getElementById("receipt-status").textContent).toBe("Complete");
+    expect(document.getElementById("receipt-status").textContent).toBe("Paid");
     expect(document.getElementById("receipt-card").textContent).toBe("**** **** **** 1111");
   });
 });

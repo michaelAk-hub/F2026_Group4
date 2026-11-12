@@ -1,11 +1,35 @@
-// Payment form - Stefania (Week 4)
+// Payment form - Stefania (Week 4, connected to the payment API in Week 5)
 // Checks the card details on the reservation page (RQ09, RQ11).
 // Maria's reserve.js creates the reservation first and puts its ids on the form,
 // then the driver pays here and goes to the receipt page.
 
-// "4111 1111 1111 1111" -> "4111111111111111"
+// the address of the backend. api.js sets API_BASE_URL in the browser,
+// the Jest tests do not load api.js so they use the same address from here.
+var PAYMENT_API_URL = typeof API_BASE_URL !== "undefined" ? API_BASE_URL : "http://localhost:3000/api";
+
+// "4242 4242-4242 4242" -> "4242424242424242"
 function onlyDigits(text) {
-  return text.replace(/ /g, "");
+  return text.replace(/[ -]/g, "");
+}
+
+// Luhn check, the same as Neofytos's payment service.
+// From the right, double every second digit (minus 9 if it is more than 9)
+// and add everything. A real card number gives a total we can divide by 10.
+function passesLuhn(digits) {
+  var sum = 0;
+  var double = false;
+  for (var i = digits.length - 1; i >= 0; i--) {
+    var n = Number(digits[i]);
+    if (double) {
+      n = n * 2;
+      if (n > 9) {
+        n = n - 9;
+      }
+    }
+    sum = sum + n;
+    double = !double;
+  }
+  return sum % 10 === 0;
 }
 
 // the expiry is "MM/YY", the card works until the end of that month
@@ -30,30 +54,29 @@ function isExpiryOk(expiry, today) {
   return true;
 }
 
-// same idea as Maria's validators.js: { valid: true/false, errors: {...} }
+// the same rules as the server (paymentService.js), so the driver sees
+// the mistake before sending. Same idea as Maria's validators.js.
 function validatePayment(data, today) {
   var errors = {};
 
-  if (!/^[A-Za-z ]{2,}$/.test(data.cardName.trim())) {
-    errors.cardName = "Enter the name on the card.";
+  if (data.cardName.trim().length < 2) {
+    errors.cardName = "Please enter the name on the card.";
   }
-  if (!/^[0-9]{16}$/.test(onlyDigits(data.cardNumber))) {
-    errors.cardNumber = "The card number must have 16 digits.";
+
+  var digits = onlyDigits(data.cardNumber);
+  if (!/^[0-9]{13,19}$/.test(digits) || !passesLuhn(digits)) {
+    errors.cardNumber = "The card number is not valid.";
   }
+
   if (!isExpiryOk(data.expiry.trim(), today)) {
     errors.expiry = "Use MM/YY and a date that is not in the past.";
   }
-  if (!/^[0-9]{3}$/.test(data.cvv.trim())) {
-    errors.cvv = "The CVV must have 3 digits.";
+
+  if (!/^[0-9]{3,4}$/.test(data.cvv.trim())) {
+    errors.cvv = "The CVV must be 3 or 4 digits.";
   }
 
   return { valid: Object.keys(errors).length === 0, errors: errors };
-}
-
-// we keep only the last 4 digits, never the full card number (PCI-DSS)
-function maskCard(cardNumber) {
-  var digits = onlyDigits(cardNumber);
-  return "**** **** **** " + digits.slice(-4);
 }
 
 // write the error under each field (empty text = no error)
@@ -65,15 +88,43 @@ function showErrors(errors) {
   }
 }
 
-// Mock payment: Neofytos's payment service is not on main yet.
-// When it is, this function will send the payment to the backend and
-// then call /reservations/:id/confirm. The rest of the page stays the same.
-function sendPayment(reservationId, paymentId, card) {
-  return Promise.resolve({
-    paymentId: paymentId,
-    status: "Complete",
-    paidAt: new Date().toISOString()
+// send data to the backend with the driver's token.
+// If the server says no, we throw an error with the server's message.
+async function postWithToken(path, data) {
+  var response = await fetch(PAYMENT_API_URL + path, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + localStorage.getItem("token")
+    },
+    body: JSON.stringify(data)
   });
+  var result = await response.json();
+  if (!response.ok) {
+    throw new Error(result.message || "The payment failed. Please try again.");
+  }
+  return result;
+}
+
+// BUG-06: pay with Neofytos's payment API, then confirm with Giorgos's API.
+// The amount is not sent, the server already knows it (RQ09).
+async function sendPayment(reservationId, card) {
+  var paid = await postWithToken("/payments", {
+    reservationId: reservationId,
+    cardName: card.cardName,
+    cardNumber: card.cardNumber,
+    expiry: card.expiry,
+    cvv: card.cvv
+  });
+
+  // only after a complete payment the reservation can be confirmed
+  var confirmed = await postWithToken("/reservations/" + reservationId + "/confirm", {});
+
+  return {
+    receiptId: paid.receipt.receiptId,
+    cardLast4: paid.receipt.cardLast4,
+    status: confirmed.reservation.status
+  };
 }
 
 // the text of Date, Time, Duration and Total from Maria's ticket
@@ -118,22 +169,23 @@ async function handlePay() {
   message.textContent = "Paying...";
 
   try {
-    var card = maskCard(data.cardNumber);
-    var payment = await sendPayment(form.dataset.reservationId, form.dataset.paymentId, card);
+    var payment = await sendPayment(form.dataset.reservationId, data);
 
-    // the receipt page reads this. No full card number and no CVV in it.
+    // the receipt page reads this. Only the last 4 digits from the server,
+    // no full card number and no CVV (PCI-DSS).
     var receipt = readTicket();
     receipt.reservationId = form.dataset.reservationId;
-    receipt.paymentId = payment.paymentId;
+    receipt.paymentId = form.dataset.paymentId;
+    receipt.receiptId = payment.receiptId;
     receipt.status = payment.status;
-    receipt.paidAt = payment.paidAt;
-    receipt.card = card;
+    receipt.card = "**** **** **** " + payment.cardLast4;
     sessionStorage.setItem("receipt", JSON.stringify(receipt));
 
     message.textContent = "Payment complete.";
     return true;
   } catch (error) {
-    message.textContent = "The payment failed. Please try again.";
+    // for example "Your card was declined. Please try another card."
+    message.textContent = error.message;
     button.disabled = false;
     return false;
   }
@@ -151,5 +203,5 @@ function setupPayment() {
 
 // lets the Jest tests use the functions (the browser ignores this)
 if (typeof module !== "undefined") {
-  module.exports = { onlyDigits, isExpiryOk, validatePayment, maskCard, showErrors, sendPayment, readTicket, handlePay, setupPayment };
+  module.exports = { onlyDigits, passesLuhn, isExpiryOk, validatePayment, showErrors, postWithToken, sendPayment, readTicket, handlePay, setupPayment };
 }
