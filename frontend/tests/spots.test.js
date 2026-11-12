@@ -2,6 +2,7 @@
  * @jest-environment jsdom
  */
 // Tests for the spot details panel, status filter and legend - Stefania (Week 3)
+// and the "+ RESERVE A SPOT" button (Week 5)
 // The map is empty in dashboard.html; Maria's map.js fills it from the server.
 // Here drawSpots() puts spots into #map the same way her map.js does.
 
@@ -189,6 +190,39 @@ describe('legend (RQ26)', () => {
       const button = document.querySelector('#legend button[data-status="' + states[i] + '"]');
       expect(button.querySelector('.dot.' + states[i])).not.toBeNull();
     }
+  });
+});
+
+describe('+ RESERVE A SPOT button (Week 5)', () => {
+  test('without a chosen spot it stays on the dashboard and shows only the free spots', () => {
+    expect(spots.quickReserve()).toBeNull();
+    expect(visibleSpots().length).toBe(14);
+    expect(document.getElementById('detail-empty').textContent).toContain('Choose a green spot');
+  });
+
+  test('with a free spot chosen it goes to the reservation page with that spot', () => {
+    findSpot('01').click();
+    expect(spots.quickReserve()).toBe('reservation.html?spotId=spot-1');
+  });
+
+  test('an occupied spot is not sent to the reservation page', () => {
+    findSpot('03').click();
+    expect(spots.quickReserve()).toBeNull();
+    expect(document.getElementById('detail-info').hidden).toBe(true);
+  });
+
+  test('clicking the button without a spot does not open the reservation page', () => {
+    const click = new MouseEvent('click', { bubbles: true, cancelable: true });
+    document.querySelector('#quick-actions a.btn').dispatchEvent(click);
+    expect(click.defaultPrevented).toBe(true);
+    expect(document.getElementById('legend').querySelector('button.active').dataset.status).toBe('empty');
+  });
+
+  test('clicking a spot after the message shows its details again', () => {
+    spots.quickReserve();
+    findSpot('02').click();
+    expect(document.getElementById('detail-info').hidden).toBe(false);
+    expect(document.getElementById('detail-id').textContent).toBe('02');
   });
 });
 

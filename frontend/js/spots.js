@@ -1,4 +1,5 @@
 // Spot details panel, status filter and legend - Stefania (Week 3)
+// Week 5: the "+ RESERVE A SPOT" button uses the chosen spot (quickReserve)
 // Maria's map.js draws the spots inside #map and draws them again every
 // 2 seconds with the newest data. This file works on top of her map.
 
@@ -72,6 +73,7 @@ reserveLink.href = "reservation.html?spotId=" + encodeURIComponent(selectedId);
 // go back to "Click on a spot..."
 function hideSpotDetails() {
   selectedId = null;
+  document.getElementById("detail-empty").textContent = "Click on a spot to see its details.";
   document.getElementById("detail-empty").hidden = false;
   document.getElementById("detail-info").hidden = true;
 }
@@ -115,6 +117,32 @@ function refreshSpots() {
   }
 }
 
+// Week 5: the "+ RESERVE A SPOT" button at the top of the dashboard.
+// The reservation page needs a spot, so we only go there with a free spot.
+// Gives back the address to go to, or null when the driver must choose a spot first.
+function quickReserve() {
+  var spot = null;
+  if (selectedId !== null) {
+    spot = findSpotById(selectedId);
+  }
+
+  if (spot && getStatus(spot) === "empty") {
+    return "reservation.html?spotId=" + encodeURIComponent(selectedId);
+  }
+
+  // no free spot chosen: show only the free spots and tell the driver what to do
+  filterSpots("empty");
+  hideSpotDetails();
+  document.getElementById("detail-empty").textContent = "Choose a green spot on the map, then click RESERVE THIS SPOT.";
+
+  // move the page down to the map (the Jest page cannot scroll, so we check first)
+  var section = document.getElementById("map-section");
+  if (section.scrollIntoView) {
+    section.scrollIntoView({ behavior: "smooth" });
+  }
+  return null;
+}
+
 // the dashboard calls this once when the page opens
 function setupSpots() {
   var map = document.getElementById("map");
@@ -134,6 +162,15 @@ function setupSpots() {
     });
   }
 
+  // the "+ RESERVE A SPOT" button does not open the page by itself any more
+  document.querySelector("#quick-actions a.btn").addEventListener("click", function (event) {
+    event.preventDefault();
+    var address = quickReserve();
+    if (address !== null) {
+      window.location.href = address;
+    }
+  });
+
   // the browser calls refreshSpots every time the spots in #map are replaced
   var observer = new MutationObserver(refreshSpots);
   observer.observe(map, { childList: true });
@@ -141,5 +178,5 @@ function setupSpots() {
 
 // lets the Jest tests use the functions (the browser ignores this)
 if (typeof module !== "undefined") {
-  module.exports = { statusName, getStatus, statusMessage, findSpotById, showSpotDetails, hideSpotDetails, filterSpots, refreshSpots, setupSpots };
+  module.exports = { statusName, getStatus, statusMessage, findSpotById, showSpotDetails, hideSpotDetails, filterSpots, refreshSpots, quickReserve, setupSpots };
 }
