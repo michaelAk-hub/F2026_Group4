@@ -414,3 +414,33 @@ th {
   max-width: 640px;
   margin-top: 16px;
 }
+
+#booking-times {
+  border: 0;
+  margin: 0;
+  padding: 0 1rem;
+  min-width: 0;
+}
+
+.booking-time {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin: 0.5rem 0;
+}
+
+.booking-time label {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.booking-time select {
+  min-width: 4rem;
+  overflow-y: scroll;
+}
+
+#booking-error {
+  color: white;
+  font-weight: 600;
+}

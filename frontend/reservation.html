@@ -36,15 +36,35 @@
           </div>
           <div class="ticket-line"></div>
           <!-- Week 4: the driver chooses the reservation start and end times. -->
-          <div class="field">
-            <label for="startTime">Start date and time</label>
-            <input id="startTime" type="datetime-local" required>
+          <fieldset id="booking-times">
+  <legend>Reservation dates and times</legend>
+
+          <div class="booking-time">
+            <label>Start date
+              <input id="startDate" type="date" required>
+            </label>
+            <label>Hour
+              <select id="startHour" size="3" aria-label="Start hour"></select>
+            </label>
+            <label>Minute
+              <select id="startMinute" size="3" aria-label="Start minute"></select>
+            </label>
           </div>
 
-          <div class="field">
-            <label for="endTime">End date and time</label>
-            <input id="endTime" type="datetime-local" required>
+          <div class="booking-time">
+            <label>End date
+              <input id="endDate" type="date" required>
+            </label>
+            <label>Hour
+              <select id="endHour" size="3" aria-label="End hour"></select>
+            </label>
+            <label>Minute
+              <select id="endMinute" size="3" aria-label="End minute"></select>
+            </label>
           </div>
+
+          <p id="booking-error" role="status"></p>
+        </fieldset>
 
           <div class="ticket-details">
             <div><span>Date</span><b>26 Oct 2026</b></div>
