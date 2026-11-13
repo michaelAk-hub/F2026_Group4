@@ -1,4 +1,4 @@
-// Reservation expiry job (Member 3, Week 5).
+// Reservation expiry job (Member 3, Week 4).
 // server.js runs it every minute. It frees parking spots in two cases:
 //   1. Unpaid reservation: the driver has HOLD_MINUTES to pay (RQ09). After that
 //      the reservation and its unfinished payment are deleted, so the time is free again.
