@@ -88,6 +88,10 @@ All endpoints start with `/api`.
 | GET | `/api/spots` | All parking spots with their state for the live map | Member 5 |
 | GET | `/api/spots?status=empty` | Only the spots in one state (`empty`, `occupied`, `reserved`, `unknown`) | Member 5 |
 | GET | `/api/spots/stream` | Live updates of the spots (Server-Sent Events) | Member 5 |
+| GET | `/api/me` | The profile of the logged-in driver: `{ user: { name, email, carNumber, paymentMethod } }` (driver login needed) | Member 5 |
+| PUT | `/api/me` | Change `name`, `email`, `carNumber` and/or `paymentMethod` (e.g. "Visa ending 4242", never a card number). Wrong values: 400, nothing saved; email of another account: 409 | Member 5 |
+| GET | `/api/reservations/mine` | `{ reservations }`: only MY reservations, newest first, with `parkingSpotID.spotLocation` and the payment in `paymentID` | Member 5 |
+| GET | `/api/payments/mine` | `{ payments }`: only MY payments, newest first, with `receiptId`, `cardLast4` and `reservationId` | Member 5 |
 
 Example answer of `GET /api/spots`:
 
