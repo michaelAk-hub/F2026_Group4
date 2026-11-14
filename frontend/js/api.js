@@ -7,8 +7,15 @@
 
 var API_BASE_URL = "http://localhost:3000/api";
 
-async function postToApi(path, data, token) {
-  var headers = {
+function postToApi(path, data, token) {
+  return requestApi("POST", path, data, token);
+}
+
+function getFromApi(path, token) {
+  return requestApi("GET", path, undefined, token);
+}
+
+async function requestApi(method, path, data, token) {  var headers = {
     "Content-Type": "application/json"
   };
 
@@ -21,7 +28,7 @@ async function postToApi(path, data, token) {
 
   try {
     response = await fetch(API_BASE_URL + path, {
-      method: "POST",
+      method: method,
       headers: headers,
       body: JSON.stringify(data)
     });

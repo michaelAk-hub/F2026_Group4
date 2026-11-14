@@ -26,12 +26,22 @@
 
       <section class="box" id="reservations">
         <!-- the filters will work in week 5 -->
-        <div class="filters" id="filters">
-          <button class="filter-btn active" type="button">All</button>
-          <button class="filter-btn" type="button">Upcoming</button>
-          <button class="filter-btn" type="button">Completed</button>
-          <button class="filter-btn" type="button">Cancelled</button>
-        </div>
+        <div class="history-toolbar">
+  <div class="filters" id="filters">
+    <button class="filter-btn active" type="button">All</button>
+    <button class="filter-btn" type="button">Upcoming</button>
+    <button class="filter-btn" type="button">Completed</button>
+    <button class="filter-btn" type="button">Cancelled</button>
+  </div>
+
+  <div class="history-sort">
+    <label for="date-sort">Sort by date</label>
+    <select id="date-sort">
+      <option value="newest">Newest first</option>
+      <option value="oldest">Oldest first</option>
+    </select>
+  </div>
+</div>
 
         <table id="reservations-table">
           <thead>
@@ -44,9 +54,10 @@
             </tr>
           </thead>
           <tbody>
-            <tr><td>05</td><td>26 Oct 2026</td><td>14:00 - 16:00</td><td>€4.00</td><td>Upcoming</td></tr>
+          <!--  <tr><td>05</td><td>26 Oct 2026</td><td>14:00 - 16:00</td><td>€4.00</td><td>Upcoming</td></tr>
             <tr><td>13</td><td>20 Oct 2026</td><td>11:00 - 13:00</td><td>€4.00</td><td>Completed</td></tr>
             <tr><td>02</td><td>18 Oct 2026</td><td>16:00 - 18:00</td><td>€4.00</td><td>Cancelled</td></tr>
+         -->
           </tbody>
         </table>
 
@@ -61,5 +72,8 @@
   <script>
     requireRole("driver");
   </script>
+  <script src="js/api.js"></script>
+  <script src="js/history.js"></script>
+  <script src="js/history.js"></script>
 </body>
 </html>
