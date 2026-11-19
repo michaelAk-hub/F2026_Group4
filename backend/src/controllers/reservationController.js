@@ -162,4 +162,28 @@ async function confirmReservation(req, res) {
   res.json({ message: 'Reservation confirmed.', reservation: toJson(reservation, payment) });
 }
 
-module.exports = { createReservation, confirmReservation, PRICE_PER_HOUR };
+// BUG-01, safer: two drivers who reserve the SAME spot at the same moment are now handled one
+// after the other. The second one waits until the first one is saved, so its first check
+// (the overlap check) already sees the first reservation and gets 409.
+// Before this, the two saves could happen in the opposite order of their _id, and then
+// the second check (the _id check) let both of them keep the spot.
+const waitingPerSpot = new Map(); // spotId -> the last request for that spot
+
+function oneAtATimePerSpot(handler) {
+  return async (req, res) => {
+    const key = String(req.body && req.body.spotId); // requests for other spots do not wait
+    const before = waitingPerSpot.get(key) || Promise.resolve(); // the request in front of us
+    let finished; // we call it when we are done
+    const mine = new Promise((resolve) => { finished = resolve; });
+    waitingPerSpot.set(key, mine); // the next request for this spot waits for us
+    await before; // wait for the request in front of us
+    try {
+      return await handler(req, res); // now we are alone on this spot
+    } finally {
+      finished(); // let the next one go
+      if (waitingPerSpot.get(key) === mine) waitingPerSpot.delete(key); // nobody is waiting: clean up
+    }
+  };
+}
+
+module.exports = { createReservation: oneAtATimePerSpot(createReservation), confirmReservation, PRICE_PER_HOUR };

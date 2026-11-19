@@ -111,12 +111,27 @@ describe('Reservation API', () => {
   test('TC-G60: two drivers who reserve the same spot at the same moment do not both get it (RQ08)', async () => {
     const otherToken = await loginDriver('nikos@example.com');
 
-    // both requests are sent together, so both pass the first overlap check
+    // both requests are sent together
     const results = await Promise.all([reserve(token, spot.id), reserve(otherToken, spot.id)]);
 
     expect(results.map((r) => r.status).sort()).toEqual([201, 409]);
     expect(await Reservation.countDocuments()).toBe(1);
     expect(await Payment.countDocuments()).toBe(1); // the payment of the removed one is deleted too
+  });
+
+  test('TC-G80: five drivers who reserve the same spot at the same moment: only one gets it (RQ08)', async () => {
+    const tokens = [token];
+    for (const name of ['nikos', 'eleni', 'petros', 'anna']) {
+      tokens.push(await loginDriver(`${name}@example.com`));
+    }
+
+    // all five requests are sent together
+    const results = await Promise.all(tokens.map((t) => reserve(t, spot.id)));
+
+    const statuses = results.map((r) => r.status).sort();
+    expect(statuses).toEqual([201, 409, 409, 409, 409]);
+    expect(await Reservation.countDocuments()).toBe(1);
+    expect(await Payment.countDocuments()).toBe(1);
   });
 
   test('TC-G61: a reservation shorter than 15 minutes is rejected, so the price is never 0.00 (RQ09)', async () => {
