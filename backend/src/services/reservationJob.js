@@ -1,4 +1,4 @@
-// Reservation expiry job (Member 3, Week 4; Week 5: BUG-02, spots are reserved when the reservation starts).
+// Reservation expiry job (Member 3, Week 5; with BUG-02: spots are reserved when the reservation starts).
 // server.js runs it every minute. It makes a spot Reserved when a paid reservation starts,
 // and it frees parking spots in two cases:
 //   1. Unpaid reservation: the driver has HOLD_MINUTES to pay (RQ09). After that
@@ -7,8 +7,8 @@
 //   2. Paid reservation that has ended: the spot goes back to Available, unless a car
 //      is still in it (Taken) or another paid reservation of the spot is running now.
 //      A paid reservation that starts later does not keep the spot Reserved (BUG-02).
-// It also frees a spot whose reservation was cancelled (deleted), because then
-// no paid reservation keeps it Reserved any more.
+// It also frees a spot whose reservation was cancelled (status "Cancelled", task of Member 4),
+// because then no paid reservation keeps it Reserved any more.
 // No timers in this file, so it is easy to test (see tests/reservationJob.test.js).
 
 const ParkingSpot = require('../models/parkingSpot');
