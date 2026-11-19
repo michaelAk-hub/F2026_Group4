@@ -36,6 +36,9 @@ async function payReservation(req, res) {
   if (!payment) {
     return res.status(404).json({ message: 'Payment not found.' });
   }
+  if (payment.paymentStatus === 'Refunded') {
+    return res.status(409).json({ message: 'This reservation was cancelled.' });
+  }
   if (payment.paymentStatus === 'Complete') {
     return res.status(409).json({ message: 'This reservation is already paid.' });
   }

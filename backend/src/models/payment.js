@@ -30,11 +30,23 @@ const paymentSchema = new mongoose.Schema
             match: [/^\d{4}$/, 'cardLast4 must be exactly 4 digits']
         },
 
+        // Task 5.4: a cancelled paid reservation gets a full refund. The payment is kept (it is the
+        // refund record) so the driver still sees it in their payment history.
+        refundedAt:
+        {
+            type: Date
+        },
+
+        refundAmount:
+        {
+            type: Number
+        },
+
         paymentStatus:
         {
             type: String,
             required: true,
-            enum: ['Incomplete','Complete'],
+            enum: ['Incomplete','Complete','Refunded'],
             default: 'Incomplete'
         }
     },

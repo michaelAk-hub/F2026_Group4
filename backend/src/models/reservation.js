@@ -19,7 +19,7 @@ const reservationSchema = new mongoose.Schema
         {
             type: String,
             required: true,
-            enum: ['Unpaid','Paid'],
+            enum: ['Unpaid','Paid','Cancelled'],
             default: 'Unpaid'
         },
 
