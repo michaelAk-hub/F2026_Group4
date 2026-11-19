@@ -31,7 +31,7 @@ function toJson(reservation, payment) {
     spotId: reservation.parkingSpotID,
     startTime: reservation.reservationStartTime,
     endTime: reservation.reservationEndTime,
-    status: reservation.reservationStatus, // "Unpaid" or "Paid"
+    status: reservation.reservationStatus, // "Unpaid", "Paid" or "Cancelled"
     paymentId: reservation.paymentID,
     amount: payment ? payment.paymentAmount : undefined,
   };
@@ -76,6 +76,7 @@ async function createReservation(req, res) {
   // Two time ranges overlap when one starts before the other ends.
   const overlap = await Reservation.exists({
     parkingSpotID: spot._id,
+    reservationStatus: { $ne: 'Cancelled' }, // a cancelled reservation no longer blocks the time
     reservationStartTime: { $lt: end },
     reservationEndTime: { $gt: start },
   });
@@ -108,6 +109,7 @@ async function createReservation(req, res) {
     const earlier = await Reservation.exists({
       _id: { $lt: reservation._id },
       parkingSpotID: spot._id,
+      reservationStatus: { $ne: 'Cancelled'},
       reservationStartTime: { $lt: end },
       reservationEndTime: { $gt: start },
     });
@@ -139,6 +141,10 @@ async function confirmReservation(req, res) {
   const reservation = await Reservation.findOne({ _id: req.params.id, userID: userId });
   if (!reservation) {
     return res.status(404).json({ message: 'Reservation not found.' });
+  }
+
+  if (reservation.reservationStatus === 'Cancelled') {
+    return res.status(409).json({ message: 'This reservation was cancelled.' });
   }
 
   const payment = await Payment.findById(reservation.paymentID);
