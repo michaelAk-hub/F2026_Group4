@@ -8,6 +8,7 @@ const ParkingSpot = require('../src/models/parkingSpot');
 const Reservation = require('../src/models/reservation');
 const Payment = require('../src/models/payment');
 const { DECLINED_TEST_CARDS } = require('../src/services/paymentService');
+const { runReservationJob } = require('../src/services/reservationJob');
 const { startTestDB, clearTestDB, stopTestDB } = require('./setup');
 
 const HOUR = 60 * 60 * 1000;
@@ -183,6 +184,10 @@ describe('Payment API', () => {
 
     expect(confirmed.status).toBe(200);
     expect(confirmed.body.reservation.status).toBe('Paid');
+    // the reservation starts in 1 hour: the spot is free until then (BUG-02),
+    // and the expiry job makes it Reserved when the reservation starts
+    expect((await ParkingSpot.findById(spot.id)).spotStatus).toBe('Available');
+    await runReservationJob(new Date(Date.now() + 2 * HOUR));
     expect((await ParkingSpot.findById(spot.id)).spotStatus).toBe('Reserved');
   });
 
