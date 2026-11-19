@@ -149,9 +149,12 @@ async function confirmReservation(req, res) {
   reservation.reservationStatus = 'Paid';
   await reservation.save();
 
-  // The spot is shown as reserved on the map, unless a car is already in it
+  // The spot is shown as reserved on the map only when the reservation has started
+  // (BUG-02), and not when a car is already in it. For a reservation that starts later,
+  // the expiry job makes the spot Reserved at the start time.
+  const started = reservation.reservationStartTime <= new Date();
   const spot = await ParkingSpot.findById(reservation.parkingSpotID);
-  if (spot && spot.spotStatus === 'Available') {
+  if (started && spot && spot.spotStatus === 'Available') {
     spot.spotStatus = 'Reserved';
     await spot.save();
   }

@@ -262,7 +262,7 @@ describe('Integration: register -> map -> reserve -> pay', () => {
     expect(await Reservation.countDocuments({ parkingSpotID: spot1._id })).toBe(1);
   });
 
-  test.failing('TC-MK40 / BUG-02: a paid reservation for tomorrow does not show the spot as reserved today (RQ05, RQ26)', async () => {
+  test('TC-MK40 / BUG-02: a paid reservation for tomorrow does not show the spot as reserved today (RQ05, RQ26)', async () => {
     const { token } = await registerAndLogin('maria@example.com');
     await reserveAndPay(token, spot1, Date.now() + 24 * HOUR);
 

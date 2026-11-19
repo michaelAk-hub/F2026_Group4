@@ -153,7 +153,7 @@ describe('Reservation API', () => {
   });
 
   test('confirm after payment makes it Paid and the spot Reserved', async () => {
-    const created = await reserve(token, spot.id);
+    const created = await reserve(token, spot.id, 0); // the reservation starts now
     const id = created.body.reservation.id;
 
     // the mock payment service of Member 4 marks the payment as Complete
@@ -166,6 +166,20 @@ describe('Reservation API', () => {
     expect(res.status).toBe(200);
     expect(res.body.reservation.status).toBe('Paid');
     expect((await ParkingSpot.findById(spot.id)).spotStatus).toBe('Reserved');
+  });
+
+  test('TC-G62: confirm of a reservation for later keeps the spot Available until it starts (BUG-02, RQ05)', async () => {
+    const created = await reserve(token, spot.id, 24); // tomorrow
+    const id = created.body.reservation.id;
+    await Payment.updateOne({ _id: created.body.reservation.paymentId }, { paymentStatus: 'Complete' });
+
+    const res = await request(app)
+      .post(`/api/reservations/${id}/confirm`)
+      .set('Authorization', 'Bearer ' + token);
+
+    expect(res.status).toBe(200);
+    expect(res.body.reservation.status).toBe('Paid');
+    expect((await ParkingSpot.findById(spot.id)).spotStatus).toBe('Available');
   });
 
   test('a driver cannot confirm the reservation of another driver', async () => {

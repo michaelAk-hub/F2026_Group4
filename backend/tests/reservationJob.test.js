@@ -79,7 +79,7 @@ describe('Reservation expiry job', () => {
     expect((await ParkingSpot.findById(spot._id)).spotStatus).toBe('Available');
   });
 
-  test('TC-G33: a spot stays Reserved while a paid reservation is running or starts later', async () => {
+  test('TC-G33: a spot stays Reserved while a paid reservation is running; one that starts later does not keep it (BUG-02)', async () => {
     spot.spotStatus = 'Reserved';
     await spot.save();
     const other = await ParkingSpot.create({ spotLocation: 'Lot A - Spot 08', spotStatus: 'Reserved' });
@@ -88,9 +88,9 @@ describe('Reservation expiry job', () => {
 
     const result = await runReservationJob();
 
-    expect(result.released).toBe(0);
+    expect(result.released).toBe(1);
     expect((await ParkingSpot.findById(spot._id)).spotStatus).toBe('Reserved');
-    expect((await ParkingSpot.findById(other._id)).spotStatus).toBe('Reserved');
+    expect((await ParkingSpot.findById(other._id)).spotStatus).toBe('Available');
   });
 
   test('TC-G34: a Taken spot (car inside) is not changed by the job', async () => {
@@ -111,6 +111,37 @@ describe('Reservation expiry job', () => {
 
     expect(result.released).toBe(1);
     expect((await ParkingSpot.findById(spot._id)).spotStatus).toBe('Available');
+  });
+
+  test('TC-G63: when a paid reservation starts, the job makes the spot Reserved (BUG-02)', async () => {
+    await makeReservation(spot, user, { status: 'Paid', paid: true, startIn: 2 * HOUR, endIn: 4 * HOUR });
+
+    const before = await runReservationJob(); // now: the reservation has not started
+    expect(before.started).toBe(0);
+    expect((await ParkingSpot.findById(spot._id)).spotStatus).toBe('Available');
+
+    const after = await runReservationJob(new Date(Date.now() + 3 * HOUR)); // later: it is running
+    expect(after.started).toBe(1);
+    expect((await ParkingSpot.findById(spot._id)).spotStatus).toBe('Reserved');
+  });
+
+  test('TC-G64: an unpaid reservation that starts does not make the spot Reserved', async () => {
+    await makeReservation(spot, user, { status: 'Unpaid', startIn: -1 * MINUTE, endIn: 2 * HOUR });
+
+    const result = await runReservationJob();
+
+    expect(result.started).toBe(0);
+    expect((await ParkingSpot.findById(spot._id)).spotStatus).toBe('Available');
+  });
+
+  test('TC-G65: a Taken spot (car inside) stays Taken when a paid reservation starts', async () => {
+    spot.spotStatus = 'Taken';
+    await spot.save();
+    await makeReservation(spot, user, { status: 'Paid', paid: true, startIn: -1 * MINUTE, endIn: 2 * HOUR });
+
+    await runReservationJob();
+
+    expect((await ParkingSpot.findById(spot._id)).spotStatus).toBe('Taken');
   });
 
   test('TC-G36: after an unpaid reservation expires, another driver can reserve the same time (API)', async () => {
