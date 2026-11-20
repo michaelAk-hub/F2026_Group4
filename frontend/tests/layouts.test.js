@@ -1,7 +1,7 @@
 /**
  * @jest-environment jsdom
  */
-// Tests for my 3 pages - Stefania (Week 1)
+// Tests for my pages - Stefania (Week 1, profile page added in Week 5)
 // Each test loads the html file and checks that the main parts are there
 
 const fs = require("fs");
@@ -13,8 +13,8 @@ function loadPage(fileName) {
   document.documentElement.innerHTML = html;
 }
 
-// things that all 3 pages must have
-const pages = ["dashboard.html", "reservation.html", "my-reservations.html"];
+// things that all driver pages must have
+const pages = ["dashboard.html", "reservation.html", "my-reservations.html", "profile.html"];
 
 for (let i = 0; i < pages.length; i++) {
   const page = pages[i];
@@ -35,10 +35,11 @@ for (let i = 0; i < pages.length; i++) {
       expect(document.querySelector(".sidebar .menu-links")).not.toBeNull();
     });
 
-    test("menu has 4 links and the last one is Logout", () => {
+    test("menu has 5 links: Profile and then Logout at the end", () => {
       const links = document.querySelectorAll(".menu-links a");
-      expect(links.length).toBe(4);
-      expect(links[3].textContent).toBe("Logout");
+      expect(links.length).toBe(5);
+      expect(links[3].getAttribute("href")).toBe("profile.html");
+      expect(links[4].textContent).toBe("Logout");
     });
 
     test("all menu links go to pages that exist", () => {

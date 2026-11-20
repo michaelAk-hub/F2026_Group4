@@ -71,7 +71,7 @@ function loadPage(fileName) {
   return html;
 }
 
-const driverPages = ['dashboard.html', 'reservation.html', 'my-reservations.html'];
+const driverPages = ['dashboard.html', 'reservation.html', 'my-reservations.html', 'receipt.html', 'profile.html'];
 
 for (let i = 0; i < driverPages.length; i++) {
   const page = driverPages[i];
