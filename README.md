@@ -92,6 +92,7 @@ All endpoints start with `/api`.
 | PUT | `/api/me` | Change `name`, `email`, `carNumber` and/or `paymentMethod` (e.g. "Visa ending 4242", never a card number). Wrong values: 400, nothing saved; email of another account: 409 | Member 5 |
 | GET | `/api/reservations/mine` | `{ reservations }`: only MY reservations, newest first, with `parkingSpotID.spotLocation` and the payment in `paymentID` | Member 5 |
 | GET | `/api/payments/mine` | `{ payments }`: only MY payments, newest first, with `receiptId`, `cardLast4` and `reservationId` | Member 5 |
+| GET | `/api/admin/dashboard` | Administrators only: live occupancy, revenue of the last 24 h / 7 days / 30 days, refunds and the 5 latest payments (used by `admin.html`) | Member 5 |
 
 Example answer of `GET /api/spots`:
 
@@ -133,6 +134,16 @@ stream.addEventListener('update', (e) => {
 - A spot that becomes `unknown` because its sensor went silent (RQ28) is also sent as an update.
 - A new sensor time alone (heartbeat) is not sent, only changes that the map shows.
 - If the connection drops, the browser reconnects by itself after 3 seconds and gets a new `snapshot`.
+
+### Administrator account
+
+There is no sign-up page for administrators. Create one (or change its password) in the backend folder:
+
+```bash
+node scripts/seed-admin.js admin@parking.com Admin12345
+```
+
+Then log in on `login.html` with that email and password; administrators are sent to `admin.html` (the admin dashboard).
 
 ## Branching and commit rules
 
