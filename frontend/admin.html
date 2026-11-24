@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <!-- Admin page shell - Stefania (Week 2). The admin layout is added in week 4 -->
+<!-- Admin dashboard: live occupied spots and revenue - Michalis (Member 5, Week 6), RQ18 -->
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -7,6 +8,7 @@
   <title>Admin - Smart Parking</title>
   <link rel="stylesheet" href="css/tokens.css">
   <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/admin.css">
 </head>
 <body>
   <div class="app">
@@ -20,7 +22,56 @@
 
     <main class="content">
       <h1>Administrator</h1>
-      <p class="subtitle">The admin pages will be added here in the next weeks.</p>
+      <p class="subtitle">Admin dashboard: live parking occupancy and revenue <span class="live-status" id="live-status" role="status">Connecting…</span></p>
+
+      <p class="admin-message" id="admin-message" role="alert" hidden></p>
+
+      <!-- live occupancy: updated by the spots stream -->
+      <section id="occupancy" aria-label="Occupancy">
+        <div class="numbers admin-numbers">
+          <div class="stat"><span>Total spots</span><b id="occ-total">–</b></div>
+          <div class="stat"><span>Occupied</span><b class="red-text" id="occ-occupied">–</b></div>
+          <div class="stat"><span>Empty</span><b class="green-text" id="occ-empty">–</b></div>
+          <div class="stat"><span>Reserved</span><b class="orange-text" id="occ-reserved">–</b></div>
+          <div class="stat"><span>Unknown</span><b id="occ-unknown">–</b></div>
+          <div class="stat"><span>Occupied now</span><b id="occ-percent">–</b></div>
+        </div>
+      </section>
+
+      <section class="box" id="live-map-section">
+        <h2>Parking Map (live)</h2>
+        <ul class="legend admin-legend">
+          <li><span class="empty"></span>Empty</li>
+          <li><span class="occupied"></span>Occupied</li>
+          <li><span class="reserved"></span>Reserved</li>
+          <li><span class="unknown"></span>Unknown</li>
+        </ul>
+        <div class="map" id="admin-map" aria-label="Parking map"></div>
+      </section>
+
+      <!-- revenue: loaded from the admin API every 30 seconds -->
+      <section class="box" id="revenue">
+        <h2>Revenue</h2>
+        <div class="numbers admin-numbers">
+          <div class="stat"><span>Last 24 hours</span><b id="rev-24h">–</b><small id="rev-24h-count"></small></div>
+          <div class="stat"><span>Last 7 days</span><b id="rev-7d">–</b><small id="rev-7d-count"></small></div>
+          <div class="stat"><span>Last 30 days</span><b id="rev-30d">–</b><small id="rev-30d-count"></small></div>
+          <div class="stat"><span>Refunds (30 days)</span><b id="refunds-30d">–</b><small id="refunds-30d-count"></small></div>
+          <div class="stat"><span>Reservations running now</span><b id="active-reservations">–</b></div>
+        </div>
+      </section>
+
+      <section class="box" id="latest">
+        <h2>Latest payments</h2>
+        <table id="latest-payments">
+          <thead>
+            <tr><th>Receipt</th><th>Spot</th><th>Amount</th><th>Paid at</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+        <p class="empty-message" id="no-payments" hidden>No payments yet.</p>
+        <p class="updated-at" id="updated-at"></p>
+      </section>
     </main>
   </div>
 
@@ -28,6 +79,11 @@
   <script src="js/auth.js"></script>
   <script>
     requireRole("admin");
+  </script>
+  <script src="js/api.js"></script>
+  <script src="js/admin-dashboard.js"></script>
+  <script>
+    startAdminDashboard();
   </script>
 </body>
 </html>

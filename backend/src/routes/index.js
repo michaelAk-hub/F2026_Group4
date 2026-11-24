@@ -21,6 +21,10 @@ router.use('/me', require('./me'));
 router.get('/reservations/mine', requireAuth, requireRole('driver'), myReservations);
 router.get('/payments/mine', requireAuth, requireRole('driver'), myPayments);
 
+// /api/admin/dashboard (Member 5, week 6): occupancy and revenue, administrators only
+const { adminDashboard } = require('../controllers/adminDashboardController');
+router.get('/admin/dashboard', requireAuth, requireRole('admin'), adminDashboard);
+
 // /api/reservations (Member 3, week 4)
 router.use('/reservations', require('./reservations'));
 
