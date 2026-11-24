@@ -31,4 +31,7 @@ router.use('/reservations', require('./reservations'));
 // /api/payments (Member 4, week 4)
 router.use('/payments', require('./payments'));
 
+// /api/sensors: add, update and remove sensors, only for administrators (Member 3, week 6)
+router.use('/sensors', require('./sensors'));
+
 module.exports = router;
