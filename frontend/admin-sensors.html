@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<!-- Week 6: Sensor Management page - Maria Antoniou -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sensor Management - Smart Parking</title>
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/layout.css">
+</head>
+<body>
+  <div class="app">
+    <nav class="sidebar">
+      <div class="brand-name"><span class="logo">P</span><span>SMART PARKING<small>ADMINISTRATOR</small></span></div>
+      <ul class="menu-links">
+        <li><a href="admin.html">Admin</a></li>
+        <li><a href="admin-sensors.html" class="active" aria-current="page">Sensors</a></li>
+        <li><a href="login.html" onclick="logout(); return false;">Logout</a></li>
+      </ul>
+    </nav>
+
+    <main class="content">
+      <h1>Sensor Management</h1>
+      <p class="subtitle">Add, edit or delete parking sensors.
+        <button id="add-sensor" class="filter-btn" type="button">Add sensor</button>
+      </p>
+
+      <section class="box">
+        <h2>Parking sensors</h2>
+        <p id="sensor-list-status" role="status"></p>
+        <table id="sensor-table">
+          <thead>
+            <tr>
+              <th scope="col">Parking spot</th>
+              <th scope="col">Coordinates</th>
+              <th scope="col">Availability</th>
+              <th scope="col">Actions</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </section>
+        <section id="sensor-editor" class="box" hidden>
+        <h2 id="sensor-editor-title">Add sensor</h2>
+
+        <form id="sensor-form">
+            <div class="field">
+            <label for="sensor-spot">Parking spot</label>
+            <select id="sensor-spot">
+                <option value="">Select a parking spot</option>
+            </select>
+            </div>
+
+            <div class="field" id="sensor-new-spot-field">
+            <label for="sensor-new-spot">New parking spot name</label>
+            <input id="sensor-new-spot" type="text" maxlength="50">
+            <p>Choose an existing spot above or enter a new spot name here.</p>
+            </div>
+
+            <div class="field">
+            <label for="sensor-latitude">Latitude</label>
+            <input id="sensor-latitude" type="number" min="-90" max="90" step="any">
+            </div>
+
+            <div class="field">
+            <label for="sensor-longitude">Longitude</label>
+            <input id="sensor-longitude" type="number" min="-180" max="180" step="any">
+            </div>
+
+            <p id="sensor-form-error" class="error" role="alert"></p>
+            <button class="btn" type="submit">Save sensor</button>
+            <button id="cancel-sensor" class="filter-btn" type="button">Cancel</button>
+        </form>
+        </section>
+    </main>
+  </div>
+
+  <script src="js/auth.js"></script>
+  <script>
+    requireRole("admin");
+  </script>
+  <script src="js/api.js"></script>
+  <script src="js/admin-sensors.js"></script>
+</body>
+</html>
