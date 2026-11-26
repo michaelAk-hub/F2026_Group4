@@ -4,6 +4,9 @@ const mongoose = require('mongoose');
 const ParkingSpot = require('../src/models/parkingSpot');
 const Sensor = require('../src/models/sensor');
 const Reservation = require('../src/models/reservation');
+const Violation = require('../src/models/violation');
+const Notification = require('../src/models/notification');
+const violationService = require('../src/services/violationService');
 const { handleMessage, sensorBackgroundCheck } = require('../src/services/sensorService');
 const { startTestDB, clearTestDB, stopTestDB } = require('./setup');
 
@@ -191,5 +194,104 @@ describe('Sensor messages', () =>
       await sendStatus(spot, 'free');
       expect((await sensorOf(spot)).sensorAvailability).toBe('Available');
       expect((await sensorOf(spot)).sensorLastSeen.getTime()).toBeGreaterThanOrEqual(NOW);
+  });
+
+  // ################ Violations: a car parks without a paid reservation (task 6.4, RQ14 / RQ15) ################
+
+  // A reservation that is running right now (one hour before and one hour after)
+  const createActiveReservation = (spot, reservationStatus, userID = new mongoose.Types.ObjectId()) =>
+    Reservation.create({
+      reservationStartTime: new Date(Date.now() - 60 * 60 * 1000),
+      reservationEndTime: new Date(Date.now() + 60 * 60 * 1000),
+      reservationStatus,
+      userID,
+      parkingSpotID: spot._id,
+      paymentID: new mongoose.Types.ObjectId(),
+    });
+
+  test('TC-SENSOR-14: A car in a spot with no reservation creates an Unreserved parking violation', async () =>
+  {
+    const spot = await createSpotWithSensor();
+
+    await sendStatus(spot, 'occupied');
+
+    const violations = await Violation.find();
+    expect(violations).toHaveLength(1);
+    expect(violations[0].violationType).toBe('Unreserved parking');
+    expect(violations[0].violationStatus).toBe('Unresolved');
+    expect(String(violations[0].parkingSpotID)).toBe(String(spot._id));
+  });
+
+  test('TC-SENSOR-15: Repeated "occupied" messages (heartbeats) give only one violation', async () =>
+  {
+    const spot = await createSpotWithSensor();
+
+    await sendStatus(spot, 'occupied');
+    await sendStatus(spot, 'occupied');
+    await sendStatus(spot, 'occupied');
+
+    expect(await Violation.countDocuments()).toBe(1);
+  });
+
+  test('TC-SENSOR-16: A car that leaves and comes back while the violation is open adds no second one', async () =>
+  {
+    const spot = await createSpotWithSensor();
+
+    await sendStatus(spot, 'occupied');
+    await sendStatus(spot, 'free');
+    await sendStatus(spot, 'occupied');
+
+    expect(await Violation.countDocuments()).toBe(1);
+  });
+
+  test('TC-SENSOR-17: A car in a spot with an active Paid reservation gives no violation', async () =>
+  {
+    const spot = await createSpotWithSensor('Reserved');
+    await createActiveReservation(spot, 'Paid');
+
+    await sendStatus(spot, 'occupied');
+
+    expect(await statusOf(spot)).toBe('Taken');
+    expect(await Violation.countDocuments()).toBe(0);
+  });
+
+  test('TC-SENSOR-18: A car in a spot with an active Unpaid reservation gives a violation and notifies that driver', async () =>
+  {
+    const spot = await createSpotWithSensor();
+    const userID = new mongoose.Types.ObjectId();
+    await createActiveReservation(spot, 'Unpaid', userID);
+
+    await sendStatus(spot, 'occupied');
+
+    const violation = await Violation.findOne();
+    expect(violation.violationType).toBe('Unpaid reservation');
+    expect(String(violation.userID)).toBe(String(userID));
+
+    const notifications = await Notification.find();
+    expect(notifications).toHaveLength(1);
+    expect(String(notifications[0].userID)).toBe(String(userID));
+    expect(String(notifications[0].violationID)).toBe(String(violation._id));
+  });
+
+  test('TC-SENSOR-19: A "free" message gives no violation', async () =>
+  {
+    const spot = await createSpotWithSensor('Taken');
+
+    await sendStatus(spot, 'free');
+
+    expect(await Violation.countDocuments()).toBe(0);
+  });
+
+  test('TC-SENSOR-20: A problem in the violation check does not break the sensor message', async () =>
+  {
+    jest.spyOn(violationService, 'checkViolations').mockRejectedValue(new Error('fail'));
+    jest.spyOn(console, 'error').mockImplementation(() => {});
+    const spot = await createSpotWithSensor();
+
+    await sendStatus(spot, 'occupied'); // must not throw
+
+    expect(await statusOf(spot)).toBe('Taken'); // the spot was still updated
+    expect(console.error).toHaveBeenCalled(); // and the problem was logged
+    expect(await Violation.countDocuments()).toBe(0);
   });
 });
