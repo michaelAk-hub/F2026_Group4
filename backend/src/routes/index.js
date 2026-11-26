@@ -34,4 +34,7 @@ router.use('/payments', require('./payments'));
 // /api/sensors: add, update and remove sensors, only for administrators (Member 3, week 6)
 router.use('/sensors', require('./sensors'));
 
+// /api/violations: list, resolve and dismiss violations, only for administrators (Member 4, week 6)
+router.use('/violations', require('./violations'));
+
 module.exports = router;

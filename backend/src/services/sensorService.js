@@ -6,6 +6,7 @@ const ParkingSpot = require('../models/parkingSpot');
 const Sensor = require('../models/sensor');
 const Reservation = require('../models/reservation');
 const spotsController = require('../controllers/spotsController.js');
+const violationService = require('./violationService'); // task 6.4: parking without a paid reservation
 
 // parking/spots/<parkingSpotID>/status        -> JSON from the sensor
 // parking/spots/<parkingSpotID>/availability  -> "online" or "offline"
@@ -70,6 +71,24 @@ async function sensorBackgroundCheck(now = Date.now(), thresholdMS = spotsContro
   return result.modifiedCount;
 }
 
+// A car has just parked in this spot: is it allowed to be there? (RQ14)
+// If there is no paid reservation, violationService records ONE violation for the incident.
+// A problem here is only logged: it must never stop the sensor message from being handled.
+async function checkSpotForViolation(parkingSpotID)
+{
+  try
+  {
+    const result = await violationService.checkViolations(parkingSpotID, new Date());
+    if (result && result.created)
+    {
+      console.log(`[MQTT] Violation recorded for spot ${parkingSpotID}: ${result.violation.violationType}`);
+    }
+  } catch (err)
+  {
+    console.error(`[MQTT] Could not check violations for spot ${parkingSpotID}:`, err);
+  }
+}
+
 // Called for every MQTT message. Never throws for bad input, only logs.
 async function handleMessage(topic, payload)
 {
@@ -118,6 +137,12 @@ async function handleMessage(topic, payload)
   } else if (result.changed)
   {
     console.log(`[MQTT] Spot ${parkingSpotID}: ${result.previous} -> ${result.current}`);
+
+    // Only when the spot CHANGES to Taken, so a repeated "occupied" message (heartbeat) is one incident
+    if (result.current === 'Taken')
+    {
+      await checkSpotForViolation(parkingSpotID);
+    }
   }
 }
 

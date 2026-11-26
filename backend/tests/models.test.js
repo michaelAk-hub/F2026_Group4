@@ -62,12 +62,11 @@ describe('Parking models', () => {
     await expect(Reservation.create({ reservationStatus: 'Unpaid' })).rejects.toMatchObject({ name: 'ValidationError' });
   });
 
-  test('violation is Unresolved by default and needs a spot and an administrator', async () => {
-    await expect(Violation.create({ violationType: 'No reservation' })).rejects.toMatchObject({ name: 'ValidationError' });
+  test('violation is Unresolved by default and needs a spot but not an Administrator', async () => {
+    await expect(Violation.create({ violationType: 'Unreserved parking' })).rejects.toMatchObject({ name: 'ValidationError' });
 
-    const admin = await Administrator.create({});
     const spot = await ParkingSpot.create({ spotLocation: 'A1' });
-    const violation = await Violation.create({ violationType: 'No reservation', parkingSpotID: spot._id, administratorID: admin._id });
+    const violation = await Violation.create({ violationType: 'Unreserved parking', parkingSpotID: spot._id });
     expect(violation.violationStatus).toBe('Unresolved');
   });
 
@@ -82,7 +81,7 @@ describe('Parking models', () => {
   test('administrator finds its violations and reports', async () => {
     const admin = await Administrator.create({});
     const spot = await ParkingSpot.create({ spotLocation: 'A1' });
-    await Violation.create({ violationType: 'No reservation', parkingSpotID: spot._id, administratorID: admin._id });
+    await Violation.create({ violationType: 'Unreserved parking', parkingSpotID: spot._id, administratorID: admin._id });
     await Report.create({ reportGenerationDate: new Date(), administratorID: admin._id });
 
     const found = await Administrator.findById(admin._id).populate('records').populate('generates');
